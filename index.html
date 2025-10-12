@@ -187,6 +187,15 @@
       text-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
     }
 
+    .translation-output {
+      font-size: clamp(1.4rem, 2vw + 1rem, 2.2rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+      color: var(--text-muted);
+      min-height: 2.5rem;
+    }
+
     .button-row {
       display: flex;
       flex-wrap: wrap;
@@ -273,6 +282,7 @@ Wie geht es dir? = How are you?"></textarea>
     <div class="panel display-panel" id="display-panel" hidden>
       <h2 id="mode-label">Mode</h2>
       <div class="sentence-output" id="sentence-output">Ready when you are!</div>
+      <div class="translation-output" id="translation-output" hidden></div>
       <div class="button-row">
         <button id="another-btn">Show another</button>
         <button class="secondary" id="back-btn">Back to setup</button>
@@ -290,6 +300,7 @@ Wie geht es dir? = How are you?"></textarea>
     const errorMessage = document.getElementById('error-message');
     const sentenceOutput = document.getElementById('sentence-output');
     const modeLabel = document.getElementById('mode-label');
+    const translationOutput = document.getElementById('translation-output');
 
     const modeDescriptions = {
       english: 'English sentence spotlight',
@@ -356,10 +367,23 @@ Wie geht es dir? = How are you?"></textarea>
       const selection = sentences[index];
 
       if (activeMode === 'english') {
-        return selection.english;
+        return {
+          display: selection.english,
+          translation: ''
+        };
       }
 
-      return transformGerman(selection.german, activeMode);
+      if (activeMode === 'german') {
+        return {
+          display: selection.german,
+          translation: ''
+        };
+      }
+
+      return {
+        display: transformGerman(selection.german, activeMode),
+        translation: selection.english
+      };
     }
 
     function showPanel(isDisplayMode) {
@@ -380,9 +404,13 @@ Wie geht es dir? = How are you?"></textarea>
       const nextSentence = pickRandomSentence();
       if (!nextSentence) {
         sentenceOutput.textContent = 'Add some sentences first!';
+        translationOutput.hidden = true;
+        translationOutput.textContent = '';
         return;
       }
-      sentenceOutput.textContent = nextSentence;
+      sentenceOutput.textContent = nextSentence.display;
+      translationOutput.textContent = nextSentence.translation;
+      translationOutput.hidden = !nextSentence.translation;
     }
 
     startBtn.addEventListener('click', () => {
@@ -412,6 +440,8 @@ Wie geht es dir? = How are you?"></textarea>
     backBtn.addEventListener('click', () => {
       showPanel(false);
       sentenceOutput.textContent = 'Ready when you are!';
+      translationOutput.textContent = '';
+      translationOutput.hidden = true;
     });
   </script>
 </body>
