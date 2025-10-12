@@ -1,1 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentence Trainer</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #38bdf8;
+      --accent-dark: #0ea5e9;
+      --text-muted: rgba(255, 255, 255, 0.7);
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
 
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg-gradient);
+      color: #f9fafb;
+      padding: 2rem;
+    }
+
+    .app-shell {
+      width: min(1100px, 100%);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(22px);
+      padding: clamp(2rem, 3vw + 1rem, 3.5rem);
+      display: grid;
+      gap: clamp(2rem, 2vw + 1rem, 3rem);
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(2.5rem, 4vw + 1rem, 4rem);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: clamp(1.05rem, 1vw + 1rem, 1.35rem);
+      max-width: 720px;
+      line-height: 1.5;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      resize: vertical;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 16px;
+      color: inherit;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      padding: 1.25rem 1.5rem;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+    }
+
+    label {
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .options {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+    }
+
+    .toggle-row.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .toggle-row .details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .switch {
+      position: relative;
+      width: 58px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 999px;
+      transition: background 0.2s ease;
+    }
+
+    .slider::before {
+      content: '';
+      position: absolute;
+      height: 26px;
+      width: 26px;
+      left: 3px;
+      bottom: 3px;
+      background: #0f172a;
+      border-radius: 50%;
+      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.4);
+    }
+
+    .switch input:checked + .slider {
+      background: var(--accent);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(26px);
+      background: #fff;
+    }
+
+    .option-card {
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+      background: rgba(15, 23, 42, 0.55);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .option-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56, 189, 248, 0.65);
+      box-shadow: 0 18px 40px rgba(8, 145, 178, 0.2);
+    }
+
+    .option-card input {
+      transform: scale(1.2);
+      margin-top: 0.3rem;
+    }
+
+    .option-card span {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    button {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      border-radius: 999px;
+      padding: 1.1rem 2.75rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      background: var(--accent-dark);
+      box-shadow: 0 12px 30px rgba(56, 189, 248, 0.3);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      box-shadow: none;
+    }
+
+    button.secondary:hover {
+      background: rgba(148, 163, 184, 0.1);
+      color: #f1f5f9;
+      transform: none;
+    }
+
+    .display-panel {
+      text-align: center;
+      gap: 2rem;
+    }
+
+    .display-panel h2 {
+      font-size: clamp(2rem, 3vw + 1.2rem, 3.5rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .sentence-output {
+      font-size: clamp(2.8rem, 6vw + 1rem, 5rem);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      min-height: 4rem;
+      color: #f9fafb;
+      text-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
+    }
+
+    .translation-output {
+      font-size: clamp(1.4rem, 2vw + 1rem, 2.2rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+      color: var(--text-muted);
+      min-height: 2.5rem;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .error {
+      color: #f87171;
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      padding: 0.85rem 1.2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .helper-text {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 1rem;
+      }
+
+      .app-shell {
+        padding: 1.75rem;
+      }
+
+      .sentence-output {
+        font-size: clamp(2.2rem, 8vw, 3.5rem);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <h1>Sentence Spotlight</h1>
+      <p>Paste your German ↔ English sentence pairs, pick a challenge mode, and train your memory with bold, high-contrast flash cards built for distance viewing.</p>
+    </header>
+
+    <div class="panel" id="input-panel">
+      <div>
+        <label for="sentence-input">Sentences (German = English, one per line)</label>
+        <textarea id="sentence-input" placeholder="Guten Morgen = Good morning
+Wie geht es dir? = How are you?"></textarea>
+        <div class="helper-text">Each line should contain a German sentence, followed by <strong>=</strong>, followed by its English translation.</div>
+      </div>
+
+      <div>
+        <label>Choose how to display your sentences</label>
+        <div class="options" role="radiogroup" aria-labelledby="display-options">
+          <label class="option-card">
+            <input type="radio" name="mode" value="english" checked />
+            <span>Full sentence in English</span>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="mode" value="german" />
+            <span>Full sentence in German</span>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="mode" value="german-no-vowels" />
+            <span>German sentence without vowels</span>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="mode" value="german-no-consonants" />
+            <span>German sentence without consonants</span>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="mode" value="initials" />
+            <span>German initials only</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="error" id="error-message"></div>
+
+      <div class="toggle-row" id="tts-row">
+        <div class="details">
+          <label for="tts-toggle">Text-to-speech</label>
+          <span class="helper-text">Hear each prompt read aloud during training.</span>
+        </div>
+        <label class="switch" aria-label="Toggle text-to-speech">
+          <input type="checkbox" id="tts-toggle" />
+          <span class="slider" aria-hidden="true"></span>
+        </label>
+      </div>
+      <div class="helper-text" id="tts-unsupported" hidden>Text-to-speech is not supported in this browser.</div>
+
+      <button id="start-btn">Start training</button>
+    </div>
+
+    <div class="panel display-panel" id="display-panel" hidden>
+      <h2 id="mode-label">Mode</h2>
+      <div class="sentence-output" id="sentence-output">Ready when you are!</div>
+      <div class="translation-output" id="translation-output" hidden></div>
+      <div class="button-row">
+        <button id="another-btn">Show another</button>
+        <button class="secondary" id="back-btn">Back to setup</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sentenceInput = document.getElementById('sentence-input');
+    const startBtn = document.getElementById('start-btn');
+    const anotherBtn = document.getElementById('another-btn');
+    const backBtn = document.getElementById('back-btn');
+    const inputPanel = document.getElementById('input-panel');
+    const displayPanel = document.getElementById('display-panel');
+    const errorMessage = document.getElementById('error-message');
+    const sentenceOutput = document.getElementById('sentence-output');
+    const modeLabel = document.getElementById('mode-label');
+    const translationOutput = document.getElementById('translation-output');
+    const ttsToggle = document.getElementById('tts-toggle');
+    const ttsRow = document.getElementById('tts-row');
+    const ttsUnsupportedMessage = document.getElementById('tts-unsupported');
+
+    const modeDescriptions = {
+      english: 'English sentence spotlight',
+      german: 'German sentence spotlight',
+      'german-no-vowels': 'German without vowels',
+      'german-no-consonants': 'German without consonants',
+      initials: 'German initials only'
+    };
+
+    let sentences = [];
+    let activeMode = 'english';
+    let ttsEnabled = false;
+    let currentSpeechSegments = [];
+
+    const supportsSpeech =
+      'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+
+    if (!supportsSpeech) {
+      ttsRow.classList.add('disabled');
+      ttsToggle.disabled = true;
+      ttsUnsupportedMessage.hidden = false;
+    } else {
+      ttsToggle.addEventListener('change', event => {
+        ttsEnabled = event.target.checked;
+        if (!ttsEnabled) {
+          window.speechSynthesis.cancel();
+        } else if (!displayPanel.hidden) {
+          speakCurrentSentence();
+        }
+      });
+    }
+
+    function parseSentences(rawInput) {
+      return rawInput
+        .split(/\n+/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .map(line => {
+          const separatorIndex = line.indexOf('=');
+          if (separatorIndex === -1) {
+            throw new Error('Each line must contain a German sentence, an equal sign, and an English translation.');
+          }
+
+          const german = line.slice(0, separatorIndex).trim();
+          const english = line.slice(separatorIndex + 1).trim();
+
+          if (!german || !english) {
+            throw new Error('Each line must contain words on both sides of the equal sign.');
+          }
+
+          return { german, english };
+        });
+    }
+
+    function transformGerman(sentence, mode) {
+      if (mode === 'german') {
+        return sentence;
+      }
+
+      const vowelsRegex = /[aeiouäöüAEIOUÄÖÜ]/g;
+      const consonantsRegex = /[bcdfghjklmnpqrstvwxyzßBCDFGHJKLMNPQRSTVWXYZẞ]/g;
+      const wordRegex = /[A-Za-zÄÖÜäöüßẞ]+/g;
+
+      switch (mode) {
+        case 'german-no-vowels':
+          return sentence.replace(vowelsRegex, '*');
+        case 'german-no-consonants':
+          return sentence.replace(consonantsRegex, '*');
+        case 'initials':
+          return sentence.replace(wordRegex, match => {
+            if (match.length <= 1) return match;
+            return match[0] + '*'.repeat(match.length - 1);
+          });
+        default:
+          return sentence;
+      }
+    }
+
+    function pickRandomSentence() {
+      if (!sentences.length) {
+        return null;
+      }
+      const index = Math.floor(Math.random() * sentences.length);
+      const selection = sentences[index];
+
+      if (activeMode === 'english') {
+        return {
+          display: selection.english,
+          translation: '',
+          speechSegments: [
+            { text: selection.english, lang: 'en-US' }
+          ]
+        };
+      }
+
+      if (activeMode === 'german') {
+        return {
+          display: selection.german,
+          translation: '',
+          speechSegments: [
+            { text: selection.german, lang: 'de-DE' }
+          ]
+        };
+      }
+
+      return {
+        display: transformGerman(selection.german, activeMode),
+        translation: selection.english,
+        speechSegments: [
+          { text: selection.german, lang: 'de-DE' },
+          { text: selection.english, lang: 'en-US' }
+        ]
+      };
+    }
+
+    function speakCurrentSentence() {
+      if (!supportsSpeech || !ttsEnabled || !currentSpeechSegments.length) {
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      currentSpeechSegments.forEach(segment => {
+        if (!segment.text) return;
+        const utterance = new SpeechSynthesisUtterance(segment.text);
+        if (segment.lang) {
+          utterance.lang = segment.lang;
+        }
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      });
+    }
+
+    function showPanel(isDisplayMode) {
+      if (isDisplayMode) {
+        inputPanel.hidden = true;
+        displayPanel.hidden = false;
+      } else {
+        displayPanel.hidden = true;
+        inputPanel.hidden = false;
+      }
+    }
+
+    function updateModeLabel() {
+      modeLabel.textContent = modeDescriptions[activeMode] || 'Sentence spotlight';
+    }
+
+    function updateSentence() {
+      const nextSentence = pickRandomSentence();
+      if (!nextSentence) {
+        sentenceOutput.textContent = 'Add some sentences first!';
+        translationOutput.hidden = true;
+        translationOutput.textContent = '';
+        currentSpeechSegments = [];
+        if (supportsSpeech) {
+          window.speechSynthesis.cancel();
+        }
+        return;
+      }
+      sentenceOutput.textContent = nextSentence.display;
+      translationOutput.textContent = nextSentence.translation;
+      translationOutput.hidden = !nextSentence.translation;
+      currentSpeechSegments = nextSentence.speechSegments || [];
+      speakCurrentSentence();
+    }
+
+    startBtn.addEventListener('click', () => {
+      try {
+        const selectedMode = document.querySelector('input[name="mode"]:checked');
+        activeMode = selectedMode ? selectedMode.value : 'english';
+        sentences = parseSentences(sentenceInput.value);
+
+        if (!sentences.length) {
+          throw new Error('Please add at least one sentence pair before starting.');
+        }
+
+        errorMessage.style.display = 'none';
+        showPanel(true);
+        updateModeLabel();
+        updateSentence();
+      } catch (error) {
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = 'block';
+      }
+    });
+
+    anotherBtn.addEventListener('click', () => {
+      updateSentence();
+    });
+
+    backBtn.addEventListener('click', () => {
+      showPanel(false);
+      sentenceOutput.textContent = 'Ready when you are!';
+      translationOutput.textContent = '';
+      translationOutput.hidden = true;
+      currentSpeechSegments = [];
+      if (supportsSpeech) {
+        window.speechSynthesis.cancel();
+      }
+    });
+  </script>
+</body>
+</html>
