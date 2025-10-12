@@ -1,1 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentence Trainer Setup</title>
+  <style>
+    :root {
+      --color-scheme: dark;
+      color-scheme: var(--color-scheme, light dark);
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --surface-bg: rgba(15, 23, 42, 0.55);
+      --surface-border: rgba(148, 163, 184, 0.25);
+      --switch-track: rgba(148, 163, 184, 0.3);
+      --switch-thumb: #0f172a;
+      --accent: #38bdf8;
+      --accent-dark: #0ea5e9;
+      --text: #f9fafb;
+      --text-muted: rgba(255, 255, 255, 0.7);
+      --button-text: #0f172a;
+      --focus-ring: rgba(56, 189, 248, 0.25);
+      --option-hover-shadow: rgba(8, 145, 178, 0.2);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.3);
+      --secondary-button-text: rgba(248, 250, 252, 0.75);
+      --secondary-button-hover-bg: rgba(148, 163, 184, 0.1);
+      --secondary-button-hover-text: #f1f5f9;
+      --swatch-border: rgba(255, 255, 255, 0.08);
+    }
 
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg-gradient);
+      color: var(--text);
+      padding: clamp(1.5rem, 3vw + 1rem, 3rem);
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    .app-shell {
+      width: min(1100px, 100%);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(22px);
+      padding: clamp(2rem, 3vw + 1rem, 3.5rem);
+      display: grid;
+      gap: clamp(2rem, 2vw + 1rem, 3rem);
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 4vw + 1rem, 4rem);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: clamp(1.05rem, 1vw + 1rem, 1.35rem);
+      max-width: 720px;
+      line-height: 1.5;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      resize: vertical;
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      color: var(--text);
+      font-size: 1.1rem;
+      line-height: 1.7;
+      padding: 1.25rem 1.5rem;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+
+    label.section-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .options {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .option-card {
+      border: 1px solid var(--surface-border);
+      border-radius: 18px;
+      padding: 1.2rem 1.4rem;
+      background: var(--surface-bg);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .option-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 18px 40px var(--option-hover-shadow);
+    }
+
+    .option-card input {
+      transform: scale(1.2);
+      margin-top: 0.3rem;
+    }
+
+    .option-card span {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .theme-grid {
+      display: grid;
+      gap: 0.9rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .theme-card {
+      border: 1px solid var(--surface-border);
+      border-radius: 18px;
+      padding: 1.1rem 1.25rem;
+      background: var(--surface-bg);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .theme-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 16px 32px var(--option-hover-shadow);
+    }
+
+    .theme-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 16px 32px var(--option-hover-shadow);
+    }
+
+    .theme-card input {
+      transform: scale(1.2);
+    }
+
+    .theme-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .theme-details strong {
+      font-size: 1.05rem;
+    }
+
+    .theme-details span {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .theme-swatch {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      flex-shrink: 0;
+      border: 2px solid var(--swatch-border);
+    }
+
+    [data-theme='nebula-night'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --surface-bg: rgba(15, 23, 42, 0.55);
+      --surface-border: rgba(148, 163, 184, 0.25);
+      --switch-track: rgba(148, 163, 184, 0.3);
+      --switch-thumb: #0f172a;
+      --accent: #38bdf8;
+      --accent-dark: #0ea5e9;
+      --text: #f9fafb;
+      --text-muted: rgba(255, 255, 255, 0.7);
+      --button-text: #0f172a;
+      --focus-ring: rgba(56, 189, 248, 0.25);
+      --option-hover-shadow: rgba(8, 145, 178, 0.2);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.3);
+      --secondary-button-text: rgba(248, 250, 252, 0.75);
+      --secondary-button-hover-bg: rgba(148, 163, 184, 0.1);
+      --secondary-button-hover-text: #f1f5f9;
+      --swatch-border: rgba(255, 255, 255, 0.08);
+    }
+
+    [data-theme='crisp-white'] {
+      --color-scheme: light;
+      --bg-gradient: linear-gradient(135deg, #ffffff, #f1f5f9);
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-border: rgba(15, 23, 42, 0.08);
+      --surface-bg: rgba(241, 245, 249, 0.85);
+      --surface-border: rgba(15, 23, 42, 0.12);
+      --switch-track: rgba(15, 23, 42, 0.2);
+      --switch-thumb: #1f2937;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --text: #111827;
+      --text-muted: #475569;
+      --button-text: #f8fafc;
+      --focus-ring: rgba(37, 99, 235, 0.25);
+      --option-hover-shadow: rgba(37, 99, 235, 0.15);
+      --secondary-button-bg: rgba(148, 163, 184, 0.12);
+      --secondary-button-border: rgba(15, 23, 42, 0.12);
+      --secondary-button-text: #1f2937;
+      --secondary-button-hover-bg: rgba(37, 99, 235, 0.12);
+      --secondary-button-hover-text: #1f2937;
+      --swatch-border: rgba(15, 23, 42, 0.12);
+    }
+
+    [data-theme='contrast-black'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #000000, #111827);
+      --card-bg: rgba(10, 10, 12, 0.9);
+      --card-border: rgba(148, 163, 184, 0.15);
+      --surface-bg: rgba(17, 24, 39, 0.7);
+      --surface-border: rgba(148, 163, 184, 0.25);
+      --switch-track: rgba(148, 163, 184, 0.35);
+      --switch-thumb: #111827;
+      --accent: #f97316;
+      --accent-dark: #ea580c;
+      --text: #f9fafb;
+      --text-muted: rgba(226, 232, 240, 0.75);
+      --button-text: #111827;
+      --focus-ring: rgba(249, 115, 22, 0.3);
+      --option-hover-shadow: rgba(249, 115, 22, 0.25);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.35);
+      --secondary-button-text: rgba(226, 232, 240, 0.8);
+      --secondary-button-hover-bg: rgba(148, 163, 184, 0.18);
+      --secondary-button-hover-text: #f8fafc;
+      --swatch-border: rgba(255, 255, 255, 0.12);
+    }
+
+    [data-theme='ocean-teal'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #0f172a, #0d9488);
+      --card-bg: rgba(15, 23, 42, 0.78);
+      --card-border: rgba(148, 163, 184, 0.18);
+      --surface-bg: rgba(8, 47, 73, 0.65);
+      --surface-border: rgba(94, 234, 212, 0.25);
+      --switch-track: rgba(45, 212, 191, 0.3);
+      --switch-thumb: #083344;
+      --accent: #2dd4bf;
+      --accent-dark: #14b8a6;
+      --text: #ecfeff;
+      --text-muted: rgba(207, 250, 254, 0.75);
+      --button-text: #042f2e;
+      --focus-ring: rgba(45, 212, 191, 0.32);
+      --option-hover-shadow: rgba(20, 184, 166, 0.3);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.35);
+      --secondary-button-text: rgba(207, 250, 254, 0.85);
+      --secondary-button-hover-bg: rgba(45, 212, 191, 0.18);
+      --secondary-button-hover-text: #ecfeff;
+      --swatch-border: rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme='sunrise-gold'] {
+      --color-scheme: light;
+      --bg-gradient: linear-gradient(135deg, #fff7ed, #fed7aa 55%, #fbbf24);
+      --card-bg: rgba(255, 247, 237, 0.92);
+      --card-border: rgba(124, 45, 18, 0.12);
+      --surface-bg: rgba(255, 237, 213, 0.9);
+      --surface-border: rgba(124, 45, 18, 0.15);
+      --switch-track: rgba(249, 115, 22, 0.25);
+      --switch-thumb: #9a3412;
+      --accent: #d97706;
+      --accent-dark: #b45309;
+      --text: #7c2d12;
+      --text-muted: rgba(120, 53, 15, 0.8);
+      --button-text: #fff7ed;
+      --focus-ring: rgba(217, 119, 6, 0.28);
+      --option-hover-shadow: rgba(217, 119, 6, 0.2);
+      --secondary-button-bg: rgba(255, 255, 255, 0.45);
+      --secondary-button-border: rgba(124, 45, 18, 0.18);
+      --secondary-button-text: #7c2d12;
+      --secondary-button-hover-bg: rgba(217, 119, 6, 0.18);
+      --secondary-button-hover-text: #7c2d12;
+      --swatch-border: rgba(124, 45, 18, 0.18);
+    }
+
+    [data-theme='forest-focus'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #052e16, #064e3b 50%, #1e3a8a);
+      --card-bg: rgba(6, 78, 59, 0.78);
+      --card-border: rgba(134, 239, 172, 0.2);
+      --surface-bg: rgba(4, 47, 29, 0.65);
+      --surface-border: rgba(74, 222, 128, 0.3);
+      --switch-track: rgba(74, 222, 128, 0.35);
+      --switch-thumb: #052e16;
+      --accent: #22c55e;
+      --accent-dark: #16a34a;
+      --text: #ecfdf5;
+      --text-muted: rgba(209, 250, 229, 0.78);
+      --button-text: #052e16;
+      --focus-ring: rgba(34, 197, 94, 0.3);
+      --option-hover-shadow: rgba(34, 197, 94, 0.28);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(74, 222, 128, 0.32);
+      --secondary-button-text: rgba(209, 250, 229, 0.85);
+      --secondary-button-hover-bg: rgba(74, 222, 128, 0.2);
+      --secondary-button-hover-text: #ecfdf5;
+      --swatch-border: rgba(240, 253, 244, 0.12);
+    }
+
+    [data-theme='royal-plum'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #2e1065, #6d28d9 55%, #be185d);
+      --card-bg: rgba(46, 16, 101, 0.82);
+      --card-border: rgba(233, 213, 255, 0.18);
+      --surface-bg: rgba(76, 29, 149, 0.65);
+      --surface-border: rgba(216, 180, 254, 0.3);
+      --switch-track: rgba(216, 180, 254, 0.35);
+      --switch-thumb: #4c1d95;
+      --accent: #f472b6;
+      --accent-dark: #ec4899;
+      --text: #fdf4ff;
+      --text-muted: rgba(248, 209, 255, 0.8);
+      --button-text: #4c0519;
+      --focus-ring: rgba(244, 114, 182, 0.3);
+      --option-hover-shadow: rgba(236, 72, 153, 0.28);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(216, 180, 254, 0.35);
+      --secondary-button-text: rgba(248, 209, 255, 0.85);
+      --secondary-button-hover-bg: rgba(244, 114, 182, 0.2);
+      --secondary-button-hover-text: #fdf4ff;
+      --swatch-border: rgba(248, 209, 255, 0.22);
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+    }
+
+    .toggle-row.disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .toggle-row .details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .toggle-row strong {
+      font-size: 1.05rem;
+    }
+
+    .toggle-row span {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .switch {
+      position: relative;
+      width: 58px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+      background: var(--switch-track);
+      border-radius: 999px;
+      transition: background 0.2s ease;
+    }
+
+    .slider::before {
+      content: '';
+      position: absolute;
+      height: 26px;
+      width: 26px;
+      left: 3px;
+      bottom: 3px;
+      background: var(--switch-thumb);
+      border-radius: 50%;
+      transition: transform 0.2s ease, background 0.2s ease;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.4);
+    }
+
+    .switch input:checked + .slider {
+      background: var(--accent);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(26px);
+      background: #fff;
+    }
+
+    button {
+      background: var(--accent);
+      color: var(--button-text);
+      border: none;
+      border-radius: 999px;
+      padding: 1.1rem 2.75rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      background: var(--accent-dark);
+      box-shadow: 0 12px 30px rgba(56, 189, 248, 0.3);
+    }
+
+    .error-message {
+      display: none;
+      color: #f87171;
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1.5rem;
+      }
+
+      textarea {
+        min-height: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header>
+      <h1>Sentence Trainer</h1>
+      <p>Load in your bilingual sentences, pick a practice style, and choose a projection-friendly colour theme.</p>
+    </header>
+
+    <section class="panel" aria-labelledby="sentence-input-label">
+      <label class="section-title" id="sentence-input-label" for="sentenceInput">Sentence pairs</label>
+      <textarea id="sentenceInput" placeholder="Guten Morgen = Good morning"></textarea>
+      <div class="error-message" id="errorMessage" role="alert"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="mode-label">
+      <label class="section-title" id="mode-label">Sentence options</label>
+      <div class="options" id="modeOptions">
+        <label class="option-card">
+          <input type="radio" name="mode" value="english" checked />
+          <span>Full sentence in English</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="german" />
+          <span>Full sentence in German</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="german-no-vowels" />
+          <span>German without vowels</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="german-no-consonants" />
+          <span>German without consonants</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="initials" />
+          <span>German initials only</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="flashcard" />
+          <span>Flashcard mode</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="tts-label">
+      <label class="section-title" id="tts-label">Audio</label>
+      <div class="toggle-row" id="ttsRow">
+        <div class="details">
+          <strong>Text to speech</strong>
+          <span>Play the practice prompts aloud in German and English.</span>
+          <span id="ttsUnsupportedMessage" hidden>Speech synthesis is unavailable in this browser.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="ttsToggle" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="theme-label">
+      <label class="section-title" id="theme-label">Colour themes</label>
+      <div class="theme-grid" id="themeOptions" role="radiogroup"></div>
+    </section>
+
+    <button id="startBtn" type="button">Start practice</button>
+  </main>
+
+  <script>
+    const sentenceInput = document.getElementById('sentenceInput');
+    const startBtn = document.getElementById('startBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const themeOptionsContainer = document.getElementById('themeOptions');
+    const ttsToggle = document.getElementById('ttsToggle');
+    const ttsRow = document.getElementById('ttsRow');
+    const ttsUnsupportedMessage = document.getElementById('ttsUnsupportedMessage');
+
+    const CONFIG_KEY = 'sentenceTrainerConfig';
+
+    const themes = [
+      {
+        id: 'nebula-night',
+        name: 'Nebula Night',
+        description: 'Electric midnight blues with cyan highlights.',
+        swatch: ['#111827', '#312e81', '#38bdf8']
+      },
+      {
+        id: 'crisp-white',
+        name: 'Crisp White',
+        description: 'Jet-black lettering on a bright white canvas.',
+        swatch: ['#ffffff', '#e2e8f0', '#2563eb']
+      },
+      {
+        id: 'contrast-black',
+        name: 'Contrast Black',
+        description: 'White lettering on a deep-black backdrop.',
+        swatch: ['#000000', '#111827', '#f97316']
+      },
+      {
+        id: 'ocean-teal',
+        name: 'Ocean Teal',
+        description: 'Cool marine greens with luminous accents.',
+        swatch: ['#0f172a', '#0d9488', '#2dd4bf']
+      },
+      {
+        id: 'sunrise-gold',
+        name: 'Sunrise Gold',
+        description: 'Warm amber hues ready for morning sessions.',
+        swatch: ['#fff7ed', '#fbbf24', '#d97706']
+      },
+      {
+        id: 'forest-focus',
+        name: 'Forest Focus',
+        description: 'Evergreen depth with energized lime accents.',
+        swatch: ['#052e16', '#16a34a', '#22c55e']
+      },
+      {
+        id: 'royal-plum',
+        name: 'Royal Plum',
+        description: 'Vivid purples with magenta highlights.',
+        swatch: ['#2e1065', '#6d28d9', '#f472b6']
+      }
+    ];
+
+    let activeTheme = 'nebula-night';
+    let ttsEnabled = false;
+
+    const supportsSpeech =
+      'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+
+    function applyTheme(themeId) {
+      activeTheme = themeId;
+      document.documentElement.setAttribute('data-theme', themeId);
+    }
+
+    function renderThemeOptions() {
+      themeOptionsContainer.innerHTML = '';
+
+      themes.forEach(theme => {
+        const label = document.createElement('label');
+        label.className = 'theme-card';
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'theme';
+        input.value = theme.id;
+        input.checked = theme.id === activeTheme;
+        input.addEventListener('change', () => {
+          if (input.checked) {
+            applyTheme(theme.id);
+            updateActiveThemeCard();
+            persistConfig({ theme: theme.id });
+          }
+        });
+
+        const swatch = document.createElement('div');
+        swatch.className = 'theme-swatch';
+        swatch.style.background =
+          theme.swatch.length > 1
+            ? `linear-gradient(135deg, ${theme.swatch.join(', ')})`
+            : theme.swatch[0];
+
+        const details = document.createElement('div');
+        details.className = 'theme-details';
+        const title = document.createElement('strong');
+        title.textContent = theme.name;
+        const description = document.createElement('span');
+        description.textContent = theme.description;
+        details.append(title, description);
+
+        label.append(input, swatch, details);
+        if (theme.id === activeTheme) {
+          label.classList.add('active');
+        }
+        themeOptionsContainer.append(label);
+      });
+    }
+
+    function updateActiveThemeCard() {
+      const cards = themeOptionsContainer.querySelectorAll('.theme-card');
+      cards.forEach(card => {
+        const input = card.querySelector('input[name="theme"]');
+        const isActive = input && input.value === activeTheme;
+        card.classList.toggle('active', Boolean(isActive));
+      });
+    }
+
+    function parseSentences(rawInput) {
+      return rawInput
+        .split(/\n+/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .map(line => {
+          const separatorIndex = line.indexOf('=');
+          if (separatorIndex === -1) {
+            throw new Error('Each line must contain a German sentence, an equal sign, and an English translation.');
+          }
+
+          const german = line.slice(0, separatorIndex).trim();
+          const english = line.slice(separatorIndex + 1).trim();
+
+          if (!german || !english) {
+            throw new Error('Each line must contain words on both sides of the equal sign.');
+          }
+
+          return { german, english };
+        });
+    }
+
+    function persistConfig(partialUpdate = {}) {
+      try {
+        const existing = sessionStorage.getItem(CONFIG_KEY);
+        const parsed = existing ? JSON.parse(existing) : {};
+        const updated = { ...parsed, ...partialUpdate };
+        sessionStorage.setItem(CONFIG_KEY, JSON.stringify(updated));
+      } catch (error) {
+        console.warn('Unable to persist configuration', error);
+      }
+    }
+
+    function restoreFromConfig() {
+      const existing = sessionStorage.getItem(CONFIG_KEY);
+      if (!existing) {
+        applyTheme(activeTheme);
+        renderThemeOptions();
+        updateActiveThemeCard();
+        return;
+      }
+
+      try {
+        const config = JSON.parse(existing);
+        if (config.rawInput) {
+          sentenceInput.value = config.rawInput;
+        }
+        if (config.mode) {
+          const modeInput = document.querySelector(`input[name="mode"][value="${config.mode}"]`);
+          if (modeInput) {
+            modeInput.checked = true;
+          }
+        }
+        if (config.theme) {
+          activeTheme = config.theme;
+        }
+        if (supportsSpeech && typeof config.tts === 'boolean') {
+          ttsEnabled = config.tts;
+          ttsToggle.checked = ttsEnabled;
+        }
+        applyTheme(activeTheme);
+      } catch (error) {
+        console.warn('Unable to restore configuration', error);
+        applyTheme(activeTheme);
+      }
+
+      renderThemeOptions();
+      updateActiveThemeCard();
+    }
+
+    applyTheme(activeTheme);
+    renderThemeOptions();
+    updateActiveThemeCard();
+
+    if (!supportsSpeech) {
+      ttsRow.classList.add('disabled');
+      ttsToggle.disabled = true;
+      ttsUnsupportedMessage.hidden = false;
+    } else {
+      ttsToggle.addEventListener('change', event => {
+        ttsEnabled = event.target.checked;
+        persistConfig({ tts: ttsEnabled });
+      });
+    }
+
+    restoreFromConfig();
+
+    startBtn.addEventListener('click', () => {
+      try {
+        const sentences = parseSentences(sentenceInput.value);
+        if (!sentences.length) {
+          throw new Error('Please add at least one sentence pair before starting.');
+        }
+
+        const selectedMode = document.querySelector('input[name="mode"]:checked');
+        const activeMode = selectedMode ? selectedMode.value : 'english';
+
+        const config = {
+          sentences,
+          mode: activeMode,
+          theme: activeTheme,
+          tts: supportsSpeech ? ttsEnabled : false,
+          rawInput: sentenceInput.value
+        };
+
+        sessionStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+        errorMessage.style.display = 'none';
+        window.location.href = 'practice.html';
+      } catch (error) {
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
