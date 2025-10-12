@@ -337,6 +337,10 @@ Wie geht es dir? = How are you?"></textarea>
             <input type="radio" name="mode" value="initials" />
             <span>German initials only</span>
           </label>
+          <label class="option-card">
+            <input type="radio" name="mode" value="flashcard" />
+            <span>Flashcard (reveal translation)</span>
+          </label>
         </div>
       </div>
 
@@ -361,6 +365,9 @@ Wie geht es dir? = How are you?"></textarea>
       <h2 id="mode-label">Mode</h2>
       <div class="sentence-output" id="sentence-output">Ready when you are!</div>
       <div class="translation-output" id="translation-output" hidden></div>
+      <div class="button-row" id="flashcard-row" hidden>
+        <button id="reveal-btn">Reveal translation</button>
+      </div>
       <div class="button-row">
         <button id="another-btn">Show another</button>
         <button class="secondary" id="back-btn">Back to setup</button>
@@ -379,6 +386,8 @@ Wie geht es dir? = How are you?"></textarea>
     const sentenceOutput = document.getElementById('sentence-output');
     const modeLabel = document.getElementById('mode-label');
     const translationOutput = document.getElementById('translation-output');
+    const flashcardRow = document.getElementById('flashcard-row');
+    const revealBtn = document.getElementById('reveal-btn');
     const ttsToggle = document.getElementById('tts-toggle');
     const ttsRow = document.getElementById('tts-row');
     const ttsUnsupportedMessage = document.getElementById('tts-unsupported');
@@ -388,13 +397,17 @@ Wie geht es dir? = How are you?"></textarea>
       german: 'German sentence spotlight',
       'german-no-vowels': 'German without vowels',
       'german-no-consonants': 'German without consonants',
-      initials: 'German initials only'
+      initials: 'German initials only',
+      flashcard: 'Flashcard mode'
     };
 
     let sentences = [];
     let activeMode = 'english';
     let ttsEnabled = false;
     let currentSpeechSegments = [];
+    let flashcardTranslationText = '';
+    let flashcardRevealed = false;
+    let flashcardRevealSpeechSegments = [];
 
     const supportsSpeech =
       'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
@@ -467,6 +480,19 @@ Wie geht es dir? = How are you?"></textarea>
       const index = Math.floor(Math.random() * sentences.length);
       const selection = sentences[index];
 
+      if (activeMode === 'flashcard') {
+        return {
+          display: selection.german,
+          translation: selection.english,
+          speechSegments: [
+            { text: selection.german, lang: 'de-DE' }
+          ],
+          revealSpeechSegments: [
+            { text: selection.english, lang: 'en-US' }
+          ]
+        };
+      }
+
       if (activeMode === 'english') {
         return {
           display: selection.english,
@@ -497,13 +523,16 @@ Wie geht es dir? = How are you?"></textarea>
       };
     }
 
-    function speakCurrentSentence() {
-      if (!supportsSpeech || !ttsEnabled || !currentSpeechSegments.length) {
+    function speakSegments(segments, { cancelFirst = true } = {}) {
+      if (!supportsSpeech || !ttsEnabled || !segments || !segments.length) {
         return;
       }
 
-      window.speechSynthesis.cancel();
-      currentSpeechSegments.forEach(segment => {
+      if (cancelFirst) {
+        window.speechSynthesis.cancel();
+      }
+
+      segments.forEach(segment => {
         if (!segment.text) return;
         const utterance = new SpeechSynthesisUtterance(segment.text);
         if (segment.lang) {
@@ -512,6 +541,10 @@ Wie geht es dir? = How are you?"></textarea>
         utterance.rate = 0.95;
         window.speechSynthesis.speak(utterance);
       });
+    }
+
+    function speakCurrentSentence() {
+      speakSegments(currentSpeechSegments);
     }
 
     function showPanel(isDisplayMode) {
@@ -535,15 +568,35 @@ Wie geht es dir? = How are you?"></textarea>
         translationOutput.hidden = true;
         translationOutput.textContent = '';
         currentSpeechSegments = [];
+        flashcardRow.hidden = true;
+        flashcardTranslationText = '';
+        flashcardRevealSpeechSegments = [];
+        flashcardRevealed = false;
         if (supportsSpeech) {
           window.speechSynthesis.cancel();
         }
         return;
       }
       sentenceOutput.textContent = nextSentence.display;
-      translationOutput.textContent = nextSentence.translation;
-      translationOutput.hidden = !nextSentence.translation;
       currentSpeechSegments = nextSentence.speechSegments || [];
+
+      if (activeMode === 'flashcard') {
+        flashcardTranslationText = nextSentence.translation || '';
+        flashcardRevealSpeechSegments = nextSentence.revealSpeechSegments || [];
+        flashcardRevealed = false;
+        translationOutput.textContent = '';
+        translationOutput.hidden = true;
+        flashcardRow.hidden = false;
+        revealBtn.textContent = 'Reveal translation';
+      } else {
+        translationOutput.textContent = nextSentence.translation;
+        translationOutput.hidden = !nextSentence.translation;
+        flashcardTranslationText = '';
+        flashcardRevealSpeechSegments = [];
+        flashcardRevealed = false;
+        flashcardRow.hidden = true;
+      }
+
       speakCurrentSentence();
     }
 
@@ -567,6 +620,26 @@ Wie geht es dir? = How are you?"></textarea>
       }
     });
 
+    revealBtn.addEventListener('click', () => {
+      if (activeMode !== 'flashcard') {
+        return;
+      }
+
+      flashcardRevealed = !flashcardRevealed;
+
+      if (flashcardRevealed) {
+        translationOutput.textContent = flashcardTranslationText;
+        translationOutput.hidden = false;
+        revealBtn.textContent = 'Hide translation';
+        speakSegments(flashcardRevealSpeechSegments);
+      } else {
+        translationOutput.textContent = '';
+        translationOutput.hidden = true;
+        revealBtn.textContent = 'Reveal translation';
+        speakCurrentSentence();
+      }
+    });
+
     anotherBtn.addEventListener('click', () => {
       updateSentence();
     });
@@ -577,6 +650,11 @@ Wie geht es dir? = How are you?"></textarea>
       translationOutput.textContent = '';
       translationOutput.hidden = true;
       currentSpeechSegments = [];
+      flashcardRow.hidden = true;
+      flashcardTranslationText = '';
+      flashcardRevealSpeechSegments = [];
+      flashcardRevealed = false;
+      revealBtn.textContent = 'Reveal translation';
       if (supportsSpeech) {
         window.speechSynthesis.cancel();
       }
