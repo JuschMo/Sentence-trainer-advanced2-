@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sentence Trainer</title>
+  <title>Sentence Trainer Setup</title>
   <style>
     :root {
       --color-scheme: dark;
@@ -21,9 +21,6 @@
       --text: #f9fafb;
       --text-muted: rgba(255, 255, 255, 0.7);
       --button-text: #0f172a;
-      --sentence-color: #f9fafb;
-      --sentence-shadow: rgba(56, 189, 248, 0.4);
-      --translation-color: rgba(248, 250, 252, 0.9);
       --focus-ring: rgba(56, 189, 248, 0.25);
       --option-hover-shadow: rgba(8, 145, 178, 0.2);
       --secondary-button-bg: transparent;
@@ -46,7 +43,7 @@
       align-items: center;
       background: var(--bg-gradient);
       color: var(--text);
-      padding: 2rem;
+      padding: clamp(1.5rem, 3vw + 1rem, 3rem);
       transition: background 0.4s ease, color 0.4s ease;
     }
 
@@ -70,7 +67,7 @@
 
     header h1 {
       margin: 0;
-      font-size: clamp(2.5rem, 4vw + 1rem, 4rem);
+      font-size: clamp(2.4rem, 4vw + 1rem, 4rem);
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
@@ -86,13 +83,12 @@
     .panel {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      gap: 1.75rem;
     }
 
     textarea {
       width: 100%;
-      min-height: 200px;
+      min-height: 220px;
       resize: vertical;
       background: var(--surface-bg);
       border: 1px solid var(--surface-border);
@@ -110,15 +106,45 @@
       box-shadow: 0 0 0 3px var(--focus-ring);
     }
 
-    label {
-      font-weight: 600;
-      letter-spacing: 0.02em;
+    label.section-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
     .options {
       display: grid;
       gap: 1rem;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .option-card {
+      border: 1px solid var(--surface-border);
+      border-radius: 18px;
+      padding: 1.2rem 1.4rem;
+      background: var(--surface-bg);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .option-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 18px 40px var(--option-hover-shadow);
+    }
+
+    .option-card input {
+      transform: scale(1.2);
+      margin-top: 0.3rem;
+    }
+
+    .option-card span {
+      font-size: 1.1rem;
+      font-weight: 600;
     }
 
     .theme-grid {
@@ -191,9 +217,6 @@
       --text: #f9fafb;
       --text-muted: rgba(255, 255, 255, 0.7);
       --button-text: #0f172a;
-      --sentence-color: #f9fafb;
-      --sentence-shadow: rgba(56, 189, 248, 0.4);
-      --translation-color: rgba(248, 250, 252, 0.9);
       --focus-ring: rgba(56, 189, 248, 0.25);
       --option-hover-shadow: rgba(8, 145, 178, 0.2);
       --secondary-button-bg: transparent;
@@ -218,9 +241,6 @@
       --text: #111827;
       --text-muted: #475569;
       --button-text: #f8fafc;
-      --sentence-color: #0f172a;
-      --sentence-shadow: rgba(37, 99, 235, 0.2);
-      --translation-color: #1f2937;
       --focus-ring: rgba(37, 99, 235, 0.25);
       --option-hover-shadow: rgba(37, 99, 235, 0.15);
       --secondary-button-bg: rgba(148, 163, 184, 0.12);
@@ -245,9 +265,6 @@
       --text: #f9fafb;
       --text-muted: rgba(226, 232, 240, 0.75);
       --button-text: #111827;
-      --sentence-color: #f9fafb;
-      --sentence-shadow: rgba(249, 115, 22, 0.45);
-      --translation-color: rgba(241, 245, 249, 0.9);
       --focus-ring: rgba(249, 115, 22, 0.3);
       --option-hover-shadow: rgba(249, 115, 22, 0.25);
       --secondary-button-bg: transparent;
@@ -272,9 +289,6 @@
       --text: #ecfeff;
       --text-muted: rgba(207, 250, 254, 0.75);
       --button-text: #042f2e;
-      --sentence-color: #ecfeff;
-      --sentence-shadow: rgba(20, 184, 166, 0.45);
-      --translation-color: rgba(207, 250, 254, 0.92);
       --focus-ring: rgba(45, 212, 191, 0.32);
       --option-hover-shadow: rgba(20, 184, 166, 0.3);
       --secondary-button-bg: transparent;
@@ -299,9 +313,6 @@
       --text: #7c2d12;
       --text-muted: rgba(120, 53, 15, 0.8);
       --button-text: #fff7ed;
-      --sentence-color: #7c2d12;
-      --sentence-shadow: rgba(217, 119, 6, 0.3);
-      --translation-color: #374151;
       --focus-ring: rgba(217, 119, 6, 0.28);
       --option-hover-shadow: rgba(217, 119, 6, 0.2);
       --secondary-button-bg: rgba(255, 255, 255, 0.45);
@@ -326,9 +337,6 @@
       --text: #ecfdf5;
       --text-muted: rgba(209, 250, 229, 0.78);
       --button-text: #052e16;
-      --sentence-color: #f0fdf4;
-      --sentence-shadow: rgba(34, 197, 94, 0.35);
-      --translation-color: rgba(209, 250, 229, 0.9);
       --focus-ring: rgba(34, 197, 94, 0.3);
       --option-hover-shadow: rgba(34, 197, 94, 0.28);
       --secondary-button-bg: transparent;
@@ -353,9 +361,6 @@
       --text: #fdf4ff;
       --text-muted: rgba(248, 209, 255, 0.8);
       --button-text: #4c0519;
-      --sentence-color: #fdf2f8;
-      --sentence-shadow: rgba(236, 72, 153, 0.4);
-      --translation-color: rgba(248, 209, 255, 0.92);
       --focus-ring: rgba(244, 114, 182, 0.3);
       --option-hover-shadow: rgba(236, 72, 153, 0.28);
       --secondary-button-bg: transparent;
@@ -378,7 +383,7 @@
     }
 
     .toggle-row.disabled {
-      opacity: 0.5;
+      opacity: 0.55;
       cursor: not-allowed;
     }
 
@@ -386,6 +391,15 @@
       display: flex;
       flex-direction: column;
       gap: 0.3rem;
+    }
+
+    .toggle-row strong {
+      font-size: 1.05rem;
+    }
+
+    .toggle-row span {
+      color: var(--text-muted);
+      font-size: 0.95rem;
     }
 
     .switch {
@@ -403,8 +417,8 @@
 
     .slider {
       position: absolute;
-      cursor: pointer;
       inset: 0;
+      cursor: pointer;
       background: var(--switch-track);
       border-radius: 999px;
       transition: background 0.2s ease;
@@ -432,34 +446,6 @@
       background: #fff;
     }
 
-    .option-card {
-      border: 1px solid var(--surface-border);
-      border-radius: 18px;
-      padding: 1.25rem 1.5rem;
-      background: var(--surface-bg);
-      display: flex;
-      align-items: flex-start;
-      gap: 0.85rem;
-      cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .option-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent);
-      box-shadow: 0 18px 40px var(--option-hover-shadow);
-    }
-
-    .option-card input {
-      transform: scale(1.2);
-      margin-top: 0.3rem;
-    }
-
-    .option-card span {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
     button {
       background: var(--accent);
       color: var(--button-text);
@@ -481,196 +467,103 @@
       box-shadow: 0 12px 30px rgba(56, 189, 248, 0.3);
     }
 
-    button.secondary {
-      background: var(--secondary-button-bg);
-      color: var(--secondary-button-text);
-      border: 1px solid var(--secondary-button-border);
-      box-shadow: none;
-    }
-
-    button.secondary:hover {
-      background: var(--secondary-button-hover-bg);
-      color: var(--secondary-button-hover-text);
-      transform: none;
-    }
-
-    .display-panel {
-      text-align: center;
-      gap: 2rem;
-    }
-
-    .display-panel h2 {
-      font-size: clamp(1rem, 1.5vw + 0.6rem, 1.75rem);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin: 0;
-    }
-
-    .sentence-output {
-      font-size: clamp(2.8rem, 6vw + 1rem, 5rem);
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      line-height: 1.3;
-      min-height: 4rem;
-      color: var(--sentence-color);
-      text-shadow: 0 8px 25px var(--sentence-shadow);
-    }
-
-    .translation-output {
-      font-size: clamp(1.4rem, 2vw + 1rem, 2.2rem);
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      line-height: 1.4;
-      color: var(--translation-color);
-      min-height: 2.5rem;
-    }
-
-    .button-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: center;
-    }
-
-    .error {
+    .error-message {
+      display: none;
       color: #f87171;
       background: rgba(248, 113, 113, 0.1);
       border: 1px solid rgba(248, 113, 113, 0.3);
-      padding: 0.85rem 1.2rem;
       border-radius: 12px;
+      padding: 0.85rem 1rem;
       font-weight: 600;
-      display: none;
     }
 
-    .helper-text {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    @media (max-width: 700px) {
+    @media (max-width: 768px) {
       body {
-        padding: 1rem;
+        padding: 1.5rem;
       }
 
-      .app-shell {
-        padding: 1.75rem;
-      }
-
-      .sentence-output {
-        font-size: clamp(2.2rem, 8vw, 3.5rem);
+      textarea {
+        min-height: 180px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
+  <main class="app-shell">
     <header>
-      <h1>Sentence Spotlight</h1>
-      <p>Paste your German ↔ English sentence pairs, pick a challenge mode, and train your memory with bold, high-contrast flash cards built for distance viewing.</p>
+      <h1>Sentence Trainer</h1>
+      <p>Load in your bilingual sentences, pick a practice style, and choose a projection-friendly colour theme.</p>
     </header>
 
-    <div class="panel" id="input-panel">
-      <div>
-        <label for="sentence-input">Sentences (German = English, one per line)</label>
-        <textarea id="sentence-input" placeholder="Guten Morgen = Good morning
-Wie geht es dir? = How are you?"></textarea>
-        <div class="helper-text">Each line should contain a German sentence, followed by <strong>=</strong>, followed by its English translation.</div>
-      </div>
+    <section class="panel" aria-labelledby="sentence-input-label">
+      <label class="section-title" id="sentence-input-label" for="sentenceInput">Sentence pairs</label>
+      <textarea id="sentenceInput" placeholder="Guten Morgen = Good morning"></textarea>
+      <div class="error-message" id="errorMessage" role="alert"></div>
+    </section>
 
-      <div>
-        <label>Choose how to display your sentences</label>
-        <div class="options" role="radiogroup" aria-labelledby="display-options">
-          <label class="option-card">
-            <input type="radio" name="mode" value="english" checked />
-            <span>Full sentence in English</span>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="mode" value="german" />
-            <span>Full sentence in German</span>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="mode" value="german-no-vowels" />
-            <span>German sentence without vowels</span>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="mode" value="german-no-consonants" />
-            <span>German sentence without consonants</span>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="mode" value="initials" />
-            <span>German initials only</span>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="mode" value="flashcard" />
-            <span>Flashcard (reveal translation)</span>
-          </label>
-        </div>
-      </div>
-
-      <div>
-        <label id="theme-label">Choose a color theme</label>
-        <div class="helper-text">Seven projector-friendly palettes keep text crisp in any room.</div>
-        <div class="theme-grid" id="theme-options" role="radiogroup" aria-labelledby="theme-label"></div>
-      </div>
-
-      <div class="error" id="error-message"></div>
-
-      <div class="toggle-row" id="tts-row">
-        <div class="details">
-          <label for="tts-toggle">Text-to-speech</label>
-          <span class="helper-text">Hear each prompt read aloud during training.</span>
-        </div>
-        <label class="switch" aria-label="Toggle text-to-speech">
-          <input type="checkbox" id="tts-toggle" />
-          <span class="slider" aria-hidden="true"></span>
+    <section class="panel" aria-labelledby="mode-label">
+      <label class="section-title" id="mode-label">Sentence options</label>
+      <div class="options" id="modeOptions">
+        <label class="option-card">
+          <input type="radio" name="mode" value="english" checked />
+          <span>Full sentence in English</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="german" />
+          <span>Full sentence in German</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="german-no-vowels" />
+          <span>German without vowels</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="german-no-consonants" />
+          <span>German without consonants</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="initials" />
+          <span>German initials only</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="flashcard" />
+          <span>Flashcard mode</span>
         </label>
       </div>
-      <div class="helper-text" id="tts-unsupported" hidden>Text-to-speech is not supported in this browser.</div>
+    </section>
 
-      <button id="start-btn">Start training</button>
-    </div>
+    <section class="panel" aria-labelledby="tts-label">
+      <label class="section-title" id="tts-label">Audio</label>
+      <div class="toggle-row" id="ttsRow">
+        <div class="details">
+          <strong>Text to speech</strong>
+          <span>Play the practice prompts aloud in German and English.</span>
+          <span id="ttsUnsupportedMessage" hidden>Speech synthesis is unavailable in this browser.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="ttsToggle" />
+          <span class="slider"></span>
+        </label>
+      </div>
+    </section>
 
-    <div class="panel display-panel" id="display-panel" hidden>
-      <h2 id="mode-label">Mode</h2>
-      <div class="sentence-output" id="sentence-output">Ready when you are!</div>
-      <div class="translation-output" id="translation-output" hidden></div>
-      <div class="button-row" id="flashcard-row" hidden>
-        <button id="reveal-btn">Reveal translation</button>
-      </div>
-      <div class="button-row">
-        <button id="another-btn">Show another</button>
-        <button class="secondary" id="back-btn">Back to setup</button>
-      </div>
-    </div>
-  </div>
+    <section class="panel" aria-labelledby="theme-label">
+      <label class="section-title" id="theme-label">Colour themes</label>
+      <div class="theme-grid" id="themeOptions" role="radiogroup"></div>
+    </section>
+
+    <button id="startBtn" type="button">Start practice</button>
+  </main>
 
   <script>
-    const sentenceInput = document.getElementById('sentence-input');
-    const startBtn = document.getElementById('start-btn');
-    const anotherBtn = document.getElementById('another-btn');
-    const backBtn = document.getElementById('back-btn');
-    const inputPanel = document.getElementById('input-panel');
-    const displayPanel = document.getElementById('display-panel');
-    const errorMessage = document.getElementById('error-message');
-    const sentenceOutput = document.getElementById('sentence-output');
-    const modeLabel = document.getElementById('mode-label');
-    const translationOutput = document.getElementById('translation-output');
-    const flashcardRow = document.getElementById('flashcard-row');
-    const revealBtn = document.getElementById('reveal-btn');
-    const ttsToggle = document.getElementById('tts-toggle');
-    const ttsRow = document.getElementById('tts-row');
-    const ttsUnsupportedMessage = document.getElementById('tts-unsupported');
-    const themeOptionsContainer = document.getElementById('theme-options');
+    const sentenceInput = document.getElementById('sentenceInput');
+    const startBtn = document.getElementById('startBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const themeOptionsContainer = document.getElementById('themeOptions');
+    const ttsToggle = document.getElementById('ttsToggle');
+    const ttsRow = document.getElementById('ttsRow');
+    const ttsUnsupportedMessage = document.getElementById('ttsUnsupportedMessage');
 
-    const modeDescriptions = {
-      english: 'English sentence spotlight',
-      german: 'German sentence spotlight',
-      'german-no-vowels': 'German without vowels',
-      'german-no-consonants': 'German without consonants',
-      initials: 'German initials only',
-      flashcard: 'Flashcard mode'
-    };
+    const CONFIG_KEY = 'sentenceTrainerConfig';
 
     const themes = [
       {
@@ -718,6 +611,10 @@ Wie geht es dir? = How are you?"></textarea>
     ];
 
     let activeTheme = 'nebula-night';
+    let ttsEnabled = false;
+
+    const supportsSpeech =
+      'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 
     function applyTheme(themeId) {
       activeTheme = themeId;
@@ -725,7 +622,6 @@ Wie geht es dir? = How are you?"></textarea>
     }
 
     function renderThemeOptions() {
-      if (!themeOptionsContainer) return;
       themeOptionsContainer.innerHTML = '';
 
       themes.forEach(theme => {
@@ -741,16 +637,16 @@ Wie geht es dir? = How are you?"></textarea>
           if (input.checked) {
             applyTheme(theme.id);
             updateActiveThemeCard();
+            persistConfig({ theme: theme.id });
           }
         });
 
         const swatch = document.createElement('div');
         swatch.className = 'theme-swatch';
-        const swatchGradient =
+        swatch.style.background =
           theme.swatch.length > 1
             ? `linear-gradient(135deg, ${theme.swatch.join(', ')})`
             : theme.swatch[0];
-        swatch.style.background = swatchGradient;
 
         const details = document.createElement('div');
         details.className = 'theme-details';
@@ -769,42 +665,11 @@ Wie geht es dir? = How are you?"></textarea>
     }
 
     function updateActiveThemeCard() {
-      if (!themeOptionsContainer) return;
       const cards = themeOptionsContainer.querySelectorAll('.theme-card');
       cards.forEach(card => {
         const input = card.querySelector('input[name="theme"]');
         const isActive = input && input.value === activeTheme;
         card.classList.toggle('active', Boolean(isActive));
-      });
-    }
-
-    applyTheme(activeTheme);
-    renderThemeOptions();
-    updateActiveThemeCard();
-
-    let sentences = [];
-    let activeMode = 'english';
-    let ttsEnabled = false;
-    let currentSpeechSegments = [];
-    let flashcardTranslationText = '';
-    let flashcardRevealed = false;
-    let flashcardRevealSpeechSegments = [];
-
-    const supportsSpeech =
-      'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
-
-    if (!supportsSpeech) {
-      ttsRow.classList.add('disabled');
-      ttsToggle.disabled = true;
-      ttsUnsupportedMessage.hidden = false;
-    } else {
-      ttsToggle.addEventListener('change', event => {
-        ttsEnabled = event.target.checked;
-        if (!ttsEnabled) {
-          window.speechSynthesis.cancel();
-        } else if (!displayPanel.hidden) {
-          speakCurrentSentence();
-        }
       });
     }
 
@@ -830,214 +695,95 @@ Wie geht es dir? = How are you?"></textarea>
         });
     }
 
-    function transformGerman(sentence, mode) {
-      if (mode === 'german') {
-        return sentence;
-      }
-
-      const vowelsRegex = /[aeiouäöüAEIOUÄÖÜ]/g;
-      const consonantsRegex = /[bcdfghjklmnpqrstvwxyzßBCDFGHJKLMNPQRSTVWXYZẞ]/g;
-      const wordRegex = /[A-Za-zÄÖÜäöüßẞ]+/g;
-
-      switch (mode) {
-        case 'german-no-vowels':
-          return sentence.replace(vowelsRegex, '*');
-        case 'german-no-consonants':
-          return sentence.replace(consonantsRegex, '*');
-        case 'initials':
-          return sentence.replace(wordRegex, match => {
-            if (match.length <= 1) return match;
-            return match[0] + '*'.repeat(match.length - 1);
-          });
-        default:
-          return sentence;
+    function persistConfig(partialUpdate = {}) {
+      try {
+        const existing = sessionStorage.getItem(CONFIG_KEY);
+        const parsed = existing ? JSON.parse(existing) : {};
+        const updated = { ...parsed, ...partialUpdate };
+        sessionStorage.setItem(CONFIG_KEY, JSON.stringify(updated));
+      } catch (error) {
+        console.warn('Unable to persist configuration', error);
       }
     }
 
-    function pickRandomSentence() {
-      if (!sentences.length) {
-        return null;
-      }
-      const index = Math.floor(Math.random() * sentences.length);
-      const selection = sentences[index];
-
-      if (activeMode === 'flashcard') {
-        return {
-          display: selection.german,
-          translation: selection.english,
-          speechSegments: [
-            { text: selection.german, lang: 'de-DE' }
-          ],
-          revealSpeechSegments: [
-            { text: selection.english, lang: 'en-US' }
-          ]
-        };
-      }
-
-      if (activeMode === 'english') {
-        return {
-          display: selection.english,
-          translation: '',
-          speechSegments: [
-            { text: selection.english, lang: 'en-US' }
-          ]
-        };
-      }
-
-      if (activeMode === 'german') {
-        return {
-          display: selection.german,
-          translation: '',
-          speechSegments: [
-            { text: selection.german, lang: 'de-DE' }
-          ]
-        };
-      }
-
-      return {
-        display: transformGerman(selection.german, activeMode),
-        translation: selection.english,
-        speechSegments: [
-          { text: selection.german, lang: 'de-DE' },
-          { text: selection.english, lang: 'en-US' }
-        ]
-      };
-    }
-
-    function speakSegments(segments, { cancelFirst = true } = {}) {
-      if (!supportsSpeech || !ttsEnabled || !segments || !segments.length) {
+    function restoreFromConfig() {
+      const existing = sessionStorage.getItem(CONFIG_KEY);
+      if (!existing) {
+        applyTheme(activeTheme);
+        renderThemeOptions();
+        updateActiveThemeCard();
         return;
       }
 
-      if (cancelFirst) {
-        window.speechSynthesis.cancel();
+      try {
+        const config = JSON.parse(existing);
+        if (config.rawInput) {
+          sentenceInput.value = config.rawInput;
+        }
+        if (config.mode) {
+          const modeInput = document.querySelector(`input[name="mode"][value="${config.mode}"]`);
+          if (modeInput) {
+            modeInput.checked = true;
+          }
+        }
+        if (config.theme) {
+          activeTheme = config.theme;
+        }
+        if (supportsSpeech && typeof config.tts === 'boolean') {
+          ttsEnabled = config.tts;
+          ttsToggle.checked = ttsEnabled;
+        }
+        applyTheme(activeTheme);
+      } catch (error) {
+        console.warn('Unable to restore configuration', error);
+        applyTheme(activeTheme);
       }
 
-      segments.forEach(segment => {
-        if (!segment.text) return;
-        const utterance = new SpeechSynthesisUtterance(segment.text);
-        if (segment.lang) {
-          utterance.lang = segment.lang;
-        }
-        utterance.rate = 0.95;
-        window.speechSynthesis.speak(utterance);
+      renderThemeOptions();
+      updateActiveThemeCard();
+    }
+
+    applyTheme(activeTheme);
+    renderThemeOptions();
+    updateActiveThemeCard();
+
+    if (!supportsSpeech) {
+      ttsRow.classList.add('disabled');
+      ttsToggle.disabled = true;
+      ttsUnsupportedMessage.hidden = false;
+    } else {
+      ttsToggle.addEventListener('change', event => {
+        ttsEnabled = event.target.checked;
+        persistConfig({ tts: ttsEnabled });
       });
     }
 
-    function speakCurrentSentence() {
-      speakSegments(currentSpeechSegments);
-    }
-
-    function showPanel(isDisplayMode) {
-      if (isDisplayMode) {
-        inputPanel.hidden = true;
-        displayPanel.hidden = false;
-      } else {
-        displayPanel.hidden = true;
-        inputPanel.hidden = false;
-      }
-    }
-
-    function updateModeLabel() {
-      modeLabel.textContent = modeDescriptions[activeMode] || 'Sentence spotlight';
-    }
-
-    function updateSentence() {
-      const nextSentence = pickRandomSentence();
-      if (!nextSentence) {
-        sentenceOutput.textContent = 'Add some sentences first!';
-        translationOutput.hidden = true;
-        translationOutput.textContent = '';
-        currentSpeechSegments = [];
-        flashcardRow.hidden = true;
-        flashcardTranslationText = '';
-        flashcardRevealSpeechSegments = [];
-        flashcardRevealed = false;
-        if (supportsSpeech) {
-          window.speechSynthesis.cancel();
-        }
-        return;
-      }
-      sentenceOutput.textContent = nextSentence.display;
-      currentSpeechSegments = nextSentence.speechSegments || [];
-
-      if (activeMode === 'flashcard') {
-        flashcardTranslationText = nextSentence.translation || '';
-        flashcardRevealSpeechSegments = nextSentence.revealSpeechSegments || [];
-        flashcardRevealed = false;
-        translationOutput.textContent = '';
-        translationOutput.hidden = true;
-        flashcardRow.hidden = false;
-        revealBtn.textContent = 'Reveal translation';
-      } else {
-        translationOutput.textContent = nextSentence.translation;
-        translationOutput.hidden = !nextSentence.translation;
-        flashcardTranslationText = '';
-        flashcardRevealSpeechSegments = [];
-        flashcardRevealed = false;
-        flashcardRow.hidden = true;
-      }
-
-      speakCurrentSentence();
-    }
+    restoreFromConfig();
 
     startBtn.addEventListener('click', () => {
       try {
-        const selectedMode = document.querySelector('input[name="mode"]:checked');
-        activeMode = selectedMode ? selectedMode.value : 'english';
-        sentences = parseSentences(sentenceInput.value);
-
+        const sentences = parseSentences(sentenceInput.value);
         if (!sentences.length) {
           throw new Error('Please add at least one sentence pair before starting.');
         }
 
+        const selectedMode = document.querySelector('input[name="mode"]:checked');
+        const activeMode = selectedMode ? selectedMode.value : 'english';
+
+        const config = {
+          sentences,
+          mode: activeMode,
+          theme: activeTheme,
+          tts: supportsSpeech ? ttsEnabled : false,
+          rawInput: sentenceInput.value
+        };
+
+        sessionStorage.setItem(CONFIG_KEY, JSON.stringify(config));
         errorMessage.style.display = 'none';
-        showPanel(true);
-        updateModeLabel();
-        updateSentence();
+        window.location.href = 'practice.html';
       } catch (error) {
         errorMessage.textContent = error.message;
         errorMessage.style.display = 'block';
-      }
-    });
-
-    revealBtn.addEventListener('click', () => {
-      if (activeMode !== 'flashcard') {
-        return;
-      }
-
-      flashcardRevealed = !flashcardRevealed;
-
-      if (flashcardRevealed) {
-        translationOutput.textContent = flashcardTranslationText;
-        translationOutput.hidden = false;
-        revealBtn.textContent = 'Hide translation';
-        speakSegments(flashcardRevealSpeechSegments);
-      } else {
-        translationOutput.textContent = '';
-        translationOutput.hidden = true;
-        revealBtn.textContent = 'Reveal translation';
-        speakCurrentSentence();
-      }
-    });
-
-    anotherBtn.addEventListener('click', () => {
-      updateSentence();
-    });
-
-    backBtn.addEventListener('click', () => {
-      showPanel(false);
-      sentenceOutput.textContent = 'Ready when you are!';
-      translationOutput.textContent = '';
-      translationOutput.hidden = true;
-      currentSpeechSegments = [];
-      flashcardRow.hidden = true;
-      flashcardTranslationText = '';
-      flashcardRevealSpeechSegments = [];
-      flashcardRevealed = false;
-      revealBtn.textContent = 'Reveal translation';
-      if (supportsSpeech) {
-        window.speechSynthesis.cancel();
       }
     });
   </script>

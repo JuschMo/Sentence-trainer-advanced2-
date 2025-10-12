@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentence Trainer Practice</title>
+  <style>
+    :root {
+      --color-scheme: dark;
+      color-scheme: var(--color-scheme, light dark);
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --surface-bg: rgba(15, 23, 42, 0.55);
+      --surface-border: rgba(148, 163, 184, 0.25);
+      --accent: #38bdf8;
+      --accent-dark: #0ea5e9;
+      --text: #f9fafb;
+      --text-muted: rgba(255, 255, 255, 0.7);
+      --sentence-color: #f9fafb;
+      --sentence-shadow: rgba(56, 189, 248, 0.4);
+      --translation-color: rgba(248, 250, 252, 0.9);
+      --focus-ring: rgba(56, 189, 248, 0.25);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.3);
+      --secondary-button-text: rgba(248, 250, 252, 0.75);
+      --secondary-button-hover-bg: rgba(148, 163, 184, 0.12);
+      --secondary-button-hover-text: #f1f5f9;
+      --swatch-border: rgba(255, 255, 255, 0.08);
+      --button-text: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg-gradient);
+      color: var(--text);
+      padding: clamp(1.5rem, 3vw + 1rem, 3rem);
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    .practice-shell {
+      width: min(1100px, 100%);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(22px);
+      padding: clamp(2rem, 3vw + 1rem, 3.5rem);
+      display: grid;
+      gap: clamp(1.5rem, 2vw + 1rem, 2.75rem);
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 4vw + 1rem, 3.6rem);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: clamp(1rem, 0.7vw + 0.9rem, 1.25rem);
+      max-width: 720px;
+    }
+
+    .display-card {
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 22px;
+      padding: clamp(1.75rem, 3vw + 1rem, 3rem);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(1.25rem, 2vw + 0.5rem, 2rem);
+      text-align: center;
+    }
+
+    .mode-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .mode-label {
+      font-size: clamp(0.85rem, 0.5vw + 0.75rem, 1.1rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .speech-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--secondary-button-bg);
+      border: 1px solid var(--secondary-button-border);
+      color: var(--secondary-button-text);
+      border-radius: 999px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .speech-toggle:hover {
+      background: var(--secondary-button-hover-bg);
+      color: var(--secondary-button-hover-text);
+    }
+
+    .speech-toggle:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .sentence-output {
+      font-size: clamp(2.6rem, 6vw + 0.8rem, 4.6rem);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      line-height: 1.25;
+      min-height: 4rem;
+      color: var(--sentence-color);
+      text-shadow: 0 8px 25px var(--sentence-shadow);
+      word-break: break-word;
+    }
+
+    .translation-output {
+      font-size: clamp(1.3rem, 2vw + 0.8rem, 2.1rem);
+      font-weight: 600;
+      color: var(--translation-color);
+      opacity: 0.9;
+      min-height: 2rem;
+    }
+
+    .flashcard-row {
+      display: flex;
+      justify-content: center;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    button.pill-btn {
+      background: var(--accent);
+      color: var(--button-text);
+      border: none;
+      border-radius: 999px;
+      padding: 0.75rem 1.85rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button.pill-btn:hover {
+      transform: translateY(-2px);
+      background: var(--accent-dark);
+      box-shadow: 0 10px 26px rgba(56, 189, 248, 0.35);
+    }
+
+    button.pill-btn.secondary {
+      background: var(--secondary-button-bg);
+      color: var(--secondary-button-text);
+      border: 1px solid var(--secondary-button-border);
+      box-shadow: none;
+    }
+
+    button.pill-btn.secondary:hover {
+      background: var(--secondary-button-hover-bg);
+      color: var(--secondary-button-hover-text);
+      transform: none;
+    }
+
+    .support-note {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .missing-config {
+      width: min(600px, 90%);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: clamp(2rem, 4vw + 1rem, 3rem);
+      text-align: center;
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    [data-theme='nebula-night'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --surface-bg: rgba(15, 23, 42, 0.55);
+      --surface-border: rgba(148, 163, 184, 0.25);
+      --accent: #38bdf8;
+      --accent-dark: #0ea5e9;
+      --text: #f9fafb;
+      --text-muted: rgba(255, 255, 255, 0.7);
+      --sentence-color: #f9fafb;
+      --sentence-shadow: rgba(56, 189, 248, 0.4);
+      --translation-color: rgba(248, 250, 252, 0.9);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.3);
+      --secondary-button-text: rgba(248, 250, 252, 0.75);
+      --secondary-button-hover-bg: rgba(148, 163, 184, 0.1);
+      --secondary-button-hover-text: #f1f5f9;
+      --button-text: #0f172a;
+    }
+
+    [data-theme='crisp-white'] {
+      --color-scheme: light;
+      --bg-gradient: linear-gradient(135deg, #ffffff, #f1f5f9);
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-border: rgba(15, 23, 42, 0.08);
+      --surface-bg: rgba(241, 245, 249, 0.85);
+      --surface-border: rgba(15, 23, 42, 0.12);
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --text: #111827;
+      --text-muted: #475569;
+      --sentence-color: #0f172a;
+      --sentence-shadow: rgba(37, 99, 235, 0.2);
+      --translation-color: #1f2937;
+      --secondary-button-bg: rgba(148, 163, 184, 0.12);
+      --secondary-button-border: rgba(15, 23, 42, 0.12);
+      --secondary-button-text: #1f2937;
+      --secondary-button-hover-bg: rgba(37, 99, 235, 0.12);
+      --secondary-button-hover-text: #1f2937;
+      --button-text: #f8fafc;
+    }
+
+    [data-theme='contrast-black'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #000000, #111827);
+      --card-bg: rgba(10, 10, 12, 0.9);
+      --card-border: rgba(148, 163, 184, 0.15);
+      --surface-bg: rgba(17, 24, 39, 0.7);
+      --surface-border: rgba(148, 163, 184, 0.25);
+      --accent: #f97316;
+      --accent-dark: #ea580c;
+      --text: #f9fafb;
+      --text-muted: rgba(226, 232, 240, 0.75);
+      --sentence-color: #f9fafb;
+      --sentence-shadow: rgba(249, 115, 22, 0.45);
+      --translation-color: rgba(241, 245, 249, 0.9);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.35);
+      --secondary-button-text: rgba(226, 232, 240, 0.8);
+      --secondary-button-hover-bg: rgba(148, 163, 184, 0.18);
+      --secondary-button-hover-text: #f8fafc;
+      --button-text: #111827;
+    }
+
+    [data-theme='ocean-teal'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #0f172a, #0d9488);
+      --card-bg: rgba(15, 23, 42, 0.78);
+      --card-border: rgba(148, 163, 184, 0.18);
+      --surface-bg: rgba(8, 47, 73, 0.65);
+      --surface-border: rgba(94, 234, 212, 0.25);
+      --accent: #2dd4bf;
+      --accent-dark: #14b8a6;
+      --text: #ecfeff;
+      --text-muted: rgba(207, 250, 254, 0.75);
+      --sentence-color: #ecfeff;
+      --sentence-shadow: rgba(20, 184, 166, 0.45);
+      --translation-color: rgba(207, 250, 254, 0.92);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.35);
+      --secondary-button-text: rgba(207, 250, 254, 0.85);
+      --secondary-button-hover-bg: rgba(45, 212, 191, 0.18);
+      --secondary-button-hover-text: #ecfeff;
+      --button-text: #042f2e;
+    }
+
+    [data-theme='sunrise-gold'] {
+      --color-scheme: light;
+      --bg-gradient: linear-gradient(135deg, #fff7ed, #fed7aa 55%, #fbbf24);
+      --card-bg: rgba(255, 247, 237, 0.92);
+      --card-border: rgba(124, 45, 18, 0.12);
+      --surface-bg: rgba(255, 237, 213, 0.9);
+      --surface-border: rgba(124, 45, 18, 0.15);
+      --accent: #d97706;
+      --accent-dark: #b45309;
+      --text: #7c2d12;
+      --text-muted: rgba(120, 53, 15, 0.8);
+      --sentence-color: #7c2d12;
+      --sentence-shadow: rgba(217, 119, 6, 0.3);
+      --translation-color: #374151;
+      --secondary-button-bg: rgba(255, 255, 255, 0.45);
+      --secondary-button-border: rgba(124, 45, 18, 0.18);
+      --secondary-button-text: #7c2d12;
+      --secondary-button-hover-bg: rgba(217, 119, 6, 0.18);
+      --secondary-button-hover-text: #7c2d12;
+      --button-text: #fff7ed;
+    }
+
+    [data-theme='forest-focus'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #052e16, #064e3b 50%, #1e3a8a);
+      --card-bg: rgba(6, 78, 59, 0.78);
+      --card-border: rgba(134, 239, 172, 0.2);
+      --surface-bg: rgba(4, 47, 29, 0.65);
+      --surface-border: rgba(74, 222, 128, 0.3);
+      --accent: #22c55e;
+      --accent-dark: #16a34a;
+      --text: #ecfdf5;
+      --text-muted: rgba(209, 250, 229, 0.78);
+      --sentence-color: #f0fdf4;
+      --sentence-shadow: rgba(34, 197, 94, 0.35);
+      --translation-color: rgba(209, 250, 229, 0.9);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(74, 222, 128, 0.32);
+      --secondary-button-text: rgba(209, 250, 229, 0.85);
+      --secondary-button-hover-bg: rgba(74, 222, 128, 0.2);
+      --secondary-button-hover-text: #ecfdf5;
+      --button-text: #052e16;
+    }
+
+    [data-theme='royal-plum'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #2e1065, #6d28d9 55%, #be185d);
+      --card-bg: rgba(46, 16, 101, 0.82);
+      --card-border: rgba(233, 213, 255, 0.18);
+      --surface-bg: rgba(76, 29, 149, 0.65);
+      --surface-border: rgba(216, 180, 254, 0.3);
+      --accent: #f472b6;
+      --accent-dark: #ec4899;
+      --text: #fdf4ff;
+      --text-muted: rgba(248, 209, 255, 0.8);
+      --sentence-color: #fdf2f8;
+      --sentence-shadow: rgba(236, 72, 153, 0.4);
+      --translation-color: rgba(248, 209, 255, 0.92);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(216, 180, 254, 0.35);
+      --secondary-button-text: rgba(248, 209, 255, 0.85);
+      --secondary-button-hover-bg: rgba(244, 114, 182, 0.2);
+      --secondary-button-hover-text: #fdf4ff;
+      --button-text: #4c0519;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1.5rem;
+      }
+
+      .mode-row {
+        flex-direction: column;
+      }
+
+      .sentence-output {
+        font-size: clamp(2.2rem, 8vw + 0.8rem, 4rem);
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="practice-shell" id="practiceShell" hidden>
+    <header>
+      <h1>Sentence Trainer</h1>
+      <p>Focus on your prompt and keep the projection crisp from any distance.</p>
+    </header>
+
+    <section class="display-card" aria-live="polite">
+      <div class="mode-row">
+        <span class="mode-label" id="modeLabel">Sentence spotlight</span>
+        <button class="speech-toggle" id="speechToggle" type="button">Speech: Off</button>
+      </div>
+      <div class="sentence-output" id="sentenceOutput">Loading…</div>
+      <div class="translation-output" id="translationOutput"></div>
+      <div class="flashcard-row" id="flashcardRow" hidden>
+        <button class="pill-btn" id="revealBtn" type="button">Reveal translation</button>
+      </div>
+      <div class="controls">
+        <button class="pill-btn" id="anotherBtn" type="button">Another sentence</button>
+        <button class="pill-btn secondary" id="backBtn" type="button">Back to setup</button>
+      </div>
+      <div class="support-note" id="speechSupportNote" hidden>Speech synthesis is unavailable in this browser.</div>
+    </section>
+  </main>
+
+  <section class="missing-config" id="missingConfig" hidden>
+    <h2>Ready to begin?</h2>
+    <p>Head back to the setup page to load your sentences and preferences, then start practice again.</p>
+    <button class="pill-btn" type="button" onclick="window.location.href='index.html'">Go to setup</button>
+  </section>
+
+  <script>
+    const CONFIG_KEY = 'sentenceTrainerConfig';
+
+    const sentenceOutput = document.getElementById('sentenceOutput');
+    const translationOutput = document.getElementById('translationOutput');
+    const modeLabel = document.getElementById('modeLabel');
+    const revealBtn = document.getElementById('revealBtn');
+    const flashcardRow = document.getElementById('flashcardRow');
+    const anotherBtn = document.getElementById('anotherBtn');
+    const backBtn = document.getElementById('backBtn');
+    const speechToggle = document.getElementById('speechToggle');
+    const speechSupportNote = document.getElementById('speechSupportNote');
+    const practiceShell = document.getElementById('practiceShell');
+    const missingConfig = document.getElementById('missingConfig');
+
+    const modeDescriptions = {
+      english: 'English sentence spotlight',
+      german: 'German sentence spotlight',
+      'german-no-vowels': 'German without vowels',
+      'german-no-consonants': 'German without consonants',
+      initials: 'German initials only',
+      flashcard: 'Flashcard mode'
+    };
+
+    const supportsSpeech =
+      'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+
+    let sentences = [];
+    let activeMode = 'english';
+    let activeTheme = 'nebula-night';
+    let ttsEnabled = false;
+    let currentSpeechSegments = [];
+    let flashcardTranslationText = '';
+    let flashcardRevealSpeechSegments = [];
+    let flashcardRevealed = false;
+
+    function applyTheme(themeId) {
+      document.documentElement.setAttribute('data-theme', themeId);
+    }
+
+    function loadConfiguration() {
+      const stored = sessionStorage.getItem(CONFIG_KEY);
+      if (!stored) {
+        practiceShell.hidden = true;
+        missingConfig.hidden = false;
+        return false;
+      }
+
+      try {
+        const config = JSON.parse(stored);
+        if (!config.sentences || !Array.isArray(config.sentences) || !config.sentences.length) {
+          practiceShell.hidden = true;
+          missingConfig.hidden = false;
+          return false;
+        }
+
+        sentences = config.sentences;
+        activeMode = config.mode || activeMode;
+        activeTheme = config.theme || activeTheme;
+        ttsEnabled = supportsSpeech ? Boolean(config.tts) : false;
+        applyTheme(activeTheme);
+        speechToggle.textContent = supportsSpeech && ttsEnabled ? 'Speech: On' : 'Speech: Off';
+
+        if (!supportsSpeech) {
+          speechToggle.disabled = true;
+          speechSupportNote.hidden = false;
+        }
+
+        practiceShell.hidden = false;
+        missingConfig.hidden = true;
+        return true;
+      } catch (error) {
+        console.warn('Unable to load configuration', error);
+        practiceShell.hidden = true;
+        missingConfig.hidden = false;
+        return false;
+      }
+    }
+
+    function transformGerman(sentence, mode) {
+      if (mode === 'german') {
+        return sentence;
+      }
+
+      const vowelsRegex = /[aeiouäöüAEIOUÄÖÜ]/g;
+      const consonantsRegex = /[bcdfghjklmnpqrstvwxyzßBCDFGHJKLMNPQRSTVWXYZẞ]/g;
+      const wordRegex = /[A-Za-zÄÖÜäöüßẞ]+/g;
+
+      switch (mode) {
+        case 'german-no-vowels':
+          return sentence.replace(vowelsRegex, '*');
+        case 'german-no-consonants':
+          return sentence.replace(consonantsRegex, '*');
+        case 'initials':
+          return sentence.replace(wordRegex, match => {
+            if (match.length <= 1) return match;
+            return match[0] + '*'.repeat(match.length - 1);
+          });
+        default:
+          return sentence;
+      }
+    }
+
+    function pickRandomSentence() {
+      if (!sentences.length) {
+        return null;
+      }
+      const index = Math.floor(Math.random() * sentences.length);
+      const selection = sentences[index];
+
+      if (activeMode === 'flashcard') {
+        return {
+          display: selection.german,
+          translation: selection.english,
+          speechSegments: [
+            { text: selection.german, lang: 'de-DE' }
+          ],
+          revealSpeechSegments: [
+            { text: selection.english, lang: 'en-US' }
+          ]
+        };
+      }
+
+      if (activeMode === 'english') {
+        return {
+          display: selection.english,
+          translation: '',
+          speechSegments: [
+            { text: selection.english, lang: 'en-US' }
+          ]
+        };
+      }
+
+      if (activeMode === 'german') {
+        return {
+          display: selection.german,
+          translation: '',
+          speechSegments: [
+            { text: selection.german, lang: 'de-DE' }
+          ]
+        };
+      }
+
+      return {
+        display: transformGerman(selection.german, activeMode),
+        translation: selection.english,
+        speechSegments: [
+          { text: selection.german, lang: 'de-DE' },
+          { text: selection.english, lang: 'en-US' }
+        ]
+      };
+    }
+
+    function speakSegments(segments, { cancelFirst = true } = {}) {
+      if (!supportsSpeech || !ttsEnabled || !segments || !segments.length) {
+        return;
+      }
+
+      if (cancelFirst) {
+        window.speechSynthesis.cancel();
+      }
+
+      segments.forEach(segment => {
+        if (!segment.text) return;
+        const utterance = new SpeechSynthesisUtterance(segment.text);
+        if (segment.lang) {
+          utterance.lang = segment.lang;
+        }
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      });
+    }
+
+    function speakCurrentSentence() {
+      speakSegments(currentSpeechSegments);
+    }
+
+    function updateModeLabel() {
+      modeLabel.textContent = modeDescriptions[activeMode] || 'Sentence spotlight';
+    }
+
+    function updateSentence() {
+      const nextSentence = pickRandomSentence();
+      if (!nextSentence) {
+        sentenceOutput.textContent = 'Add some sentences first!';
+        translationOutput.textContent = '';
+        translationOutput.hidden = true;
+        flashcardRow.hidden = true;
+        currentSpeechSegments = [];
+        flashcardTranslationText = '';
+        flashcardRevealSpeechSegments = [];
+        flashcardRevealed = false;
+        if (supportsSpeech) {
+          window.speechSynthesis.cancel();
+        }
+        return;
+      }
+
+      sentenceOutput.textContent = nextSentence.display;
+      currentSpeechSegments = nextSentence.speechSegments || [];
+
+      if (activeMode === 'flashcard') {
+        flashcardTranslationText = nextSentence.translation || '';
+        flashcardRevealSpeechSegments = nextSentence.revealSpeechSegments || [];
+        flashcardRevealed = false;
+        translationOutput.textContent = '';
+        translationOutput.hidden = true;
+        flashcardRow.hidden = false;
+        revealBtn.textContent = 'Reveal translation';
+      } else {
+        translationOutput.textContent = nextSentence.translation;
+        translationOutput.hidden = !nextSentence.translation;
+        flashcardTranslationText = '';
+        flashcardRevealSpeechSegments = [];
+        flashcardRevealed = false;
+        flashcardRow.hidden = true;
+      }
+
+      speakCurrentSentence();
+    }
+
+    function persistSessionUpdates() {
+      try {
+        const existing = sessionStorage.getItem(CONFIG_KEY);
+        if (!existing) return;
+        const parsed = JSON.parse(existing);
+        parsed.tts = supportsSpeech ? ttsEnabled : false;
+        parsed.theme = activeTheme;
+        parsed.mode = activeMode;
+        sessionStorage.setItem(CONFIG_KEY, JSON.stringify(parsed));
+      } catch (error) {
+        console.warn('Unable to persist session updates', error);
+      }
+    }
+
+    if (loadConfiguration()) {
+      updateModeLabel();
+      updateSentence();
+    }
+
+    revealBtn.addEventListener('click', () => {
+      if (activeMode !== 'flashcard') {
+        return;
+      }
+
+      flashcardRevealed = !flashcardRevealed;
+
+      if (flashcardRevealed) {
+        translationOutput.textContent = flashcardTranslationText;
+        translationOutput.hidden = false;
+        revealBtn.textContent = 'Hide translation';
+        speakSegments(flashcardRevealSpeechSegments);
+      } else {
+        translationOutput.textContent = '';
+        translationOutput.hidden = true;
+        revealBtn.textContent = 'Reveal translation';
+        speakCurrentSentence();
+      }
+    });
+
+    anotherBtn.addEventListener('click', () => {
+      updateSentence();
+    });
+
+    backBtn.addEventListener('click', () => {
+      if (supportsSpeech) {
+        window.speechSynthesis.cancel();
+      }
+      persistSessionUpdates();
+      window.location.href = 'index.html';
+    });
+
+    speechToggle.addEventListener('click', () => {
+      if (!supportsSpeech) {
+        return;
+      }
+      ttsEnabled = !ttsEnabled;
+      speechToggle.textContent = ttsEnabled ? 'Speech: On' : 'Speech: Off';
+      if (!ttsEnabled) {
+        window.speechSynthesis.cancel();
+      } else {
+        speakCurrentSentence();
+      }
+      persistSessionUpdates();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && supportsSpeech) {
+        window.speechSynthesis.cancel();
+      }
+    });
+  </script>
+</body>
+</html>
