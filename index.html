@@ -6,14 +6,32 @@
   <title>Sentence Trainer</title>
   <style>
     :root {
-      color-scheme: light dark;
+      --color-scheme: dark;
+      color-scheme: var(--color-scheme, light dark);
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
       --card-bg: rgba(17, 24, 39, 0.75);
       --card-border: rgba(255, 255, 255, 0.08);
+      --surface-bg: rgba(15, 23, 42, 0.55);
+      --surface-border: rgba(148, 163, 184, 0.25);
+      --switch-track: rgba(148, 163, 184, 0.3);
+      --switch-thumb: #0f172a;
       --accent: #38bdf8;
       --accent-dark: #0ea5e9;
+      --text: #f9fafb;
       --text-muted: rgba(255, 255, 255, 0.7);
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --button-text: #0f172a;
+      --sentence-color: #f9fafb;
+      --sentence-shadow: rgba(56, 189, 248, 0.4);
+      --translation-color: rgba(248, 250, 252, 0.9);
+      --focus-ring: rgba(56, 189, 248, 0.25);
+      --option-hover-shadow: rgba(8, 145, 178, 0.2);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.3);
+      --secondary-button-text: rgba(248, 250, 252, 0.75);
+      --secondary-button-hover-bg: rgba(148, 163, 184, 0.1);
+      --secondary-button-hover-text: #f1f5f9;
+      --swatch-border: rgba(255, 255, 255, 0.08);
     }
 
     * {
@@ -27,8 +45,9 @@
       justify-content: center;
       align-items: center;
       background: var(--bg-gradient);
-      color: #f9fafb;
+      color: var(--text);
       padding: 2rem;
+      transition: background 0.4s ease, color 0.4s ease;
     }
 
     .app-shell {
@@ -75,10 +94,10 @@
       width: 100%;
       min-height: 200px;
       resize: vertical;
-      background: rgba(15, 23, 42, 0.55);
-      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
       border-radius: 16px;
-      color: inherit;
+      color: var(--text);
       font-size: 1.1rem;
       line-height: 1.7;
       padding: 1.25rem 1.5rem;
@@ -88,7 +107,7 @@
     textarea:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 0 3px var(--focus-ring);
     }
 
     label {
@@ -102,14 +121,259 @@
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
 
+    .theme-grid {
+      display: grid;
+      gap: 0.9rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .theme-card {
+      border: 1px solid var(--surface-border);
+      border-radius: 18px;
+      padding: 1.1rem 1.25rem;
+      background: var(--surface-bg);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .theme-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 16px 32px var(--option-hover-shadow);
+    }
+
+    .theme-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 16px 32px var(--option-hover-shadow);
+    }
+
+    .theme-card input {
+      transform: scale(1.2);
+    }
+
+    .theme-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .theme-details strong {
+      font-size: 1.05rem;
+    }
+
+    .theme-details span {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .theme-swatch {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      flex-shrink: 0;
+      border: 2px solid var(--swatch-border);
+    }
+
+    [data-theme='nebula-night'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --surface-bg: rgba(15, 23, 42, 0.55);
+      --surface-border: rgba(148, 163, 184, 0.25);
+      --switch-track: rgba(148, 163, 184, 0.3);
+      --switch-thumb: #0f172a;
+      --accent: #38bdf8;
+      --accent-dark: #0ea5e9;
+      --text: #f9fafb;
+      --text-muted: rgba(255, 255, 255, 0.7);
+      --button-text: #0f172a;
+      --sentence-color: #f9fafb;
+      --sentence-shadow: rgba(56, 189, 248, 0.4);
+      --translation-color: rgba(248, 250, 252, 0.9);
+      --focus-ring: rgba(56, 189, 248, 0.25);
+      --option-hover-shadow: rgba(8, 145, 178, 0.2);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.3);
+      --secondary-button-text: rgba(248, 250, 252, 0.75);
+      --secondary-button-hover-bg: rgba(148, 163, 184, 0.1);
+      --secondary-button-hover-text: #f1f5f9;
+      --swatch-border: rgba(255, 255, 255, 0.08);
+    }
+
+    [data-theme='crisp-white'] {
+      --color-scheme: light;
+      --bg-gradient: linear-gradient(135deg, #ffffff, #f1f5f9);
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-border: rgba(15, 23, 42, 0.08);
+      --surface-bg: rgba(241, 245, 249, 0.85);
+      --surface-border: rgba(15, 23, 42, 0.12);
+      --switch-track: rgba(15, 23, 42, 0.2);
+      --switch-thumb: #1f2937;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --text: #111827;
+      --text-muted: #475569;
+      --button-text: #f8fafc;
+      --sentence-color: #0f172a;
+      --sentence-shadow: rgba(37, 99, 235, 0.2);
+      --translation-color: #1f2937;
+      --focus-ring: rgba(37, 99, 235, 0.25);
+      --option-hover-shadow: rgba(37, 99, 235, 0.15);
+      --secondary-button-bg: rgba(148, 163, 184, 0.12);
+      --secondary-button-border: rgba(15, 23, 42, 0.12);
+      --secondary-button-text: #1f2937;
+      --secondary-button-hover-bg: rgba(37, 99, 235, 0.12);
+      --secondary-button-hover-text: #1f2937;
+      --swatch-border: rgba(15, 23, 42, 0.12);
+    }
+
+    [data-theme='contrast-black'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #000000, #111827);
+      --card-bg: rgba(10, 10, 12, 0.9);
+      --card-border: rgba(148, 163, 184, 0.15);
+      --surface-bg: rgba(17, 24, 39, 0.7);
+      --surface-border: rgba(148, 163, 184, 0.25);
+      --switch-track: rgba(148, 163, 184, 0.35);
+      --switch-thumb: #111827;
+      --accent: #f97316;
+      --accent-dark: #ea580c;
+      --text: #f9fafb;
+      --text-muted: rgba(226, 232, 240, 0.75);
+      --button-text: #111827;
+      --sentence-color: #f9fafb;
+      --sentence-shadow: rgba(249, 115, 22, 0.45);
+      --translation-color: rgba(241, 245, 249, 0.9);
+      --focus-ring: rgba(249, 115, 22, 0.3);
+      --option-hover-shadow: rgba(249, 115, 22, 0.25);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.35);
+      --secondary-button-text: rgba(226, 232, 240, 0.8);
+      --secondary-button-hover-bg: rgba(148, 163, 184, 0.18);
+      --secondary-button-hover-text: #f8fafc;
+      --swatch-border: rgba(255, 255, 255, 0.12);
+    }
+
+    [data-theme='ocean-teal'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #0f172a, #0d9488);
+      --card-bg: rgba(15, 23, 42, 0.78);
+      --card-border: rgba(148, 163, 184, 0.18);
+      --surface-bg: rgba(8, 47, 73, 0.65);
+      --surface-border: rgba(94, 234, 212, 0.25);
+      --switch-track: rgba(45, 212, 191, 0.3);
+      --switch-thumb: #083344;
+      --accent: #2dd4bf;
+      --accent-dark: #14b8a6;
+      --text: #ecfeff;
+      --text-muted: rgba(207, 250, 254, 0.75);
+      --button-text: #042f2e;
+      --sentence-color: #ecfeff;
+      --sentence-shadow: rgba(20, 184, 166, 0.45);
+      --translation-color: rgba(207, 250, 254, 0.92);
+      --focus-ring: rgba(45, 212, 191, 0.32);
+      --option-hover-shadow: rgba(20, 184, 166, 0.3);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(148, 163, 184, 0.35);
+      --secondary-button-text: rgba(207, 250, 254, 0.85);
+      --secondary-button-hover-bg: rgba(45, 212, 191, 0.18);
+      --secondary-button-hover-text: #ecfeff;
+      --swatch-border: rgba(255, 255, 255, 0.1);
+    }
+
+    [data-theme='sunrise-gold'] {
+      --color-scheme: light;
+      --bg-gradient: linear-gradient(135deg, #fff7ed, #fed7aa 55%, #fbbf24);
+      --card-bg: rgba(255, 247, 237, 0.92);
+      --card-border: rgba(124, 45, 18, 0.12);
+      --surface-bg: rgba(255, 237, 213, 0.9);
+      --surface-border: rgba(124, 45, 18, 0.15);
+      --switch-track: rgba(249, 115, 22, 0.25);
+      --switch-thumb: #9a3412;
+      --accent: #d97706;
+      --accent-dark: #b45309;
+      --text: #7c2d12;
+      --text-muted: rgba(120, 53, 15, 0.8);
+      --button-text: #fff7ed;
+      --sentence-color: #7c2d12;
+      --sentence-shadow: rgba(217, 119, 6, 0.3);
+      --translation-color: #374151;
+      --focus-ring: rgba(217, 119, 6, 0.28);
+      --option-hover-shadow: rgba(217, 119, 6, 0.2);
+      --secondary-button-bg: rgba(255, 255, 255, 0.45);
+      --secondary-button-border: rgba(124, 45, 18, 0.18);
+      --secondary-button-text: #7c2d12;
+      --secondary-button-hover-bg: rgba(217, 119, 6, 0.18);
+      --secondary-button-hover-text: #7c2d12;
+      --swatch-border: rgba(124, 45, 18, 0.18);
+    }
+
+    [data-theme='forest-focus'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #052e16, #064e3b 50%, #1e3a8a);
+      --card-bg: rgba(6, 78, 59, 0.78);
+      --card-border: rgba(134, 239, 172, 0.2);
+      --surface-bg: rgba(4, 47, 29, 0.65);
+      --surface-border: rgba(74, 222, 128, 0.3);
+      --switch-track: rgba(74, 222, 128, 0.35);
+      --switch-thumb: #052e16;
+      --accent: #22c55e;
+      --accent-dark: #16a34a;
+      --text: #ecfdf5;
+      --text-muted: rgba(209, 250, 229, 0.78);
+      --button-text: #052e16;
+      --sentence-color: #f0fdf4;
+      --sentence-shadow: rgba(34, 197, 94, 0.35);
+      --translation-color: rgba(209, 250, 229, 0.9);
+      --focus-ring: rgba(34, 197, 94, 0.3);
+      --option-hover-shadow: rgba(34, 197, 94, 0.28);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(74, 222, 128, 0.32);
+      --secondary-button-text: rgba(209, 250, 229, 0.85);
+      --secondary-button-hover-bg: rgba(74, 222, 128, 0.2);
+      --secondary-button-hover-text: #ecfdf5;
+      --swatch-border: rgba(240, 253, 244, 0.12);
+    }
+
+    [data-theme='royal-plum'] {
+      --color-scheme: dark;
+      --bg-gradient: linear-gradient(135deg, #2e1065, #6d28d9 55%, #be185d);
+      --card-bg: rgba(46, 16, 101, 0.82);
+      --card-border: rgba(233, 213, 255, 0.18);
+      --surface-bg: rgba(76, 29, 149, 0.65);
+      --surface-border: rgba(216, 180, 254, 0.3);
+      --switch-track: rgba(216, 180, 254, 0.35);
+      --switch-thumb: #4c1d95;
+      --accent: #f472b6;
+      --accent-dark: #ec4899;
+      --text: #fdf4ff;
+      --text-muted: rgba(248, 209, 255, 0.8);
+      --button-text: #4c0519;
+      --sentence-color: #fdf2f8;
+      --sentence-shadow: rgba(236, 72, 153, 0.4);
+      --translation-color: rgba(248, 209, 255, 0.92);
+      --focus-ring: rgba(244, 114, 182, 0.3);
+      --option-hover-shadow: rgba(236, 72, 153, 0.28);
+      --secondary-button-bg: transparent;
+      --secondary-button-border: rgba(216, 180, 254, 0.35);
+      --secondary-button-text: rgba(248, 209, 255, 0.85);
+      --secondary-button-hover-bg: rgba(244, 114, 182, 0.2);
+      --secondary-button-hover-text: #fdf4ff;
+      --swatch-border: rgba(248, 209, 255, 0.22);
+    }
+
     .toggle-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 1rem;
       padding: 1rem 1.25rem;
-      background: rgba(15, 23, 42, 0.55);
-      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
       border-radius: 16px;
     }
 
@@ -141,7 +405,7 @@
       position: absolute;
       cursor: pointer;
       inset: 0;
-      background: rgba(148, 163, 184, 0.3);
+      background: var(--switch-track);
       border-radius: 999px;
       transition: background 0.2s ease;
     }
@@ -153,7 +417,7 @@
       width: 26px;
       left: 3px;
       bottom: 3px;
-      background: #0f172a;
+      background: var(--switch-thumb);
       border-radius: 50%;
       transition: transform 0.2s ease, background 0.2s ease;
       box-shadow: 0 6px 16px rgba(15, 23, 42, 0.4);
@@ -169,10 +433,10 @@
     }
 
     .option-card {
-      border: 1px solid rgba(148, 163, 184, 0.2);
+      border: 1px solid var(--surface-border);
       border-radius: 18px;
       padding: 1.25rem 1.5rem;
-      background: rgba(15, 23, 42, 0.55);
+      background: var(--surface-bg);
       display: flex;
       align-items: flex-start;
       gap: 0.85rem;
@@ -182,8 +446,8 @@
 
     .option-card:hover {
       transform: translateY(-4px);
-      border-color: rgba(56, 189, 248, 0.65);
-      box-shadow: 0 18px 40px rgba(8, 145, 178, 0.2);
+      border-color: var(--accent);
+      box-shadow: 0 18px 40px var(--option-hover-shadow);
     }
 
     .option-card input {
@@ -198,7 +462,7 @@
 
     button {
       background: var(--accent);
-      color: #0f172a;
+      color: var(--button-text);
       border: none;
       border-radius: 999px;
       padding: 1.1rem 2.75rem;
@@ -218,15 +482,15 @@
     }
 
     button.secondary {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: var(--secondary-button-bg);
+      color: var(--secondary-button-text);
+      border: 1px solid var(--secondary-button-border);
       box-shadow: none;
     }
 
     button.secondary:hover {
-      background: rgba(148, 163, 184, 0.1);
-      color: #f1f5f9;
+      background: var(--secondary-button-hover-bg);
+      color: var(--secondary-button-hover-text);
       transform: none;
     }
 
@@ -249,8 +513,8 @@
       letter-spacing: 0.04em;
       line-height: 1.3;
       min-height: 4rem;
-      color: #f9fafb;
-      text-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
+      color: var(--sentence-color);
+      text-shadow: 0 8px 25px var(--sentence-shadow);
     }
 
     .translation-output {
@@ -258,7 +522,7 @@
       font-weight: 600;
       letter-spacing: 0.02em;
       line-height: 1.4;
-      color: var(--text-muted);
+      color: var(--translation-color);
       min-height: 2.5rem;
     }
 
@@ -344,6 +608,12 @@ Wie geht es dir? = How are you?"></textarea>
         </div>
       </div>
 
+      <div>
+        <label id="theme-label">Choose a color theme</label>
+        <div class="helper-text">Seven projector-friendly palettes keep text crisp in any room.</div>
+        <div class="theme-grid" id="theme-options" role="radiogroup" aria-labelledby="theme-label"></div>
+      </div>
+
       <div class="error" id="error-message"></div>
 
       <div class="toggle-row" id="tts-row">
@@ -391,6 +661,7 @@ Wie geht es dir? = How are you?"></textarea>
     const ttsToggle = document.getElementById('tts-toggle');
     const ttsRow = document.getElementById('tts-row');
     const ttsUnsupportedMessage = document.getElementById('tts-unsupported');
+    const themeOptionsContainer = document.getElementById('theme-options');
 
     const modeDescriptions = {
       english: 'English sentence spotlight',
@@ -400,6 +671,116 @@ Wie geht es dir? = How are you?"></textarea>
       initials: 'German initials only',
       flashcard: 'Flashcard mode'
     };
+
+    const themes = [
+      {
+        id: 'nebula-night',
+        name: 'Nebula Night',
+        description: 'Electric midnight blues with cyan highlights.',
+        swatch: ['#111827', '#312e81', '#38bdf8']
+      },
+      {
+        id: 'crisp-white',
+        name: 'Crisp White',
+        description: 'Jet-black lettering on a bright white canvas.',
+        swatch: ['#ffffff', '#e2e8f0', '#2563eb']
+      },
+      {
+        id: 'contrast-black',
+        name: 'Contrast Black',
+        description: 'White lettering on a deep-black backdrop.',
+        swatch: ['#000000', '#111827', '#f97316']
+      },
+      {
+        id: 'ocean-teal',
+        name: 'Ocean Teal',
+        description: 'Cool marine greens with luminous accents.',
+        swatch: ['#0f172a', '#0d9488', '#2dd4bf']
+      },
+      {
+        id: 'sunrise-gold',
+        name: 'Sunrise Gold',
+        description: 'Warm amber hues ready for morning sessions.',
+        swatch: ['#fff7ed', '#fbbf24', '#d97706']
+      },
+      {
+        id: 'forest-focus',
+        name: 'Forest Focus',
+        description: 'Evergreen depth with energized lime accents.',
+        swatch: ['#052e16', '#16a34a', '#22c55e']
+      },
+      {
+        id: 'royal-plum',
+        name: 'Royal Plum',
+        description: 'Vivid purples with magenta highlights.',
+        swatch: ['#2e1065', '#6d28d9', '#f472b6']
+      }
+    ];
+
+    let activeTheme = 'nebula-night';
+
+    function applyTheme(themeId) {
+      activeTheme = themeId;
+      document.documentElement.setAttribute('data-theme', themeId);
+    }
+
+    function renderThemeOptions() {
+      if (!themeOptionsContainer) return;
+      themeOptionsContainer.innerHTML = '';
+
+      themes.forEach(theme => {
+        const label = document.createElement('label');
+        label.className = 'theme-card';
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'theme';
+        input.value = theme.id;
+        input.checked = theme.id === activeTheme;
+        input.addEventListener('change', () => {
+          if (input.checked) {
+            applyTheme(theme.id);
+            updateActiveThemeCard();
+          }
+        });
+
+        const swatch = document.createElement('div');
+        swatch.className = 'theme-swatch';
+        const swatchGradient =
+          theme.swatch.length > 1
+            ? `linear-gradient(135deg, ${theme.swatch.join(', ')})`
+            : theme.swatch[0];
+        swatch.style.background = swatchGradient;
+
+        const details = document.createElement('div');
+        details.className = 'theme-details';
+        const title = document.createElement('strong');
+        title.textContent = theme.name;
+        const description = document.createElement('span');
+        description.textContent = theme.description;
+        details.append(title, description);
+
+        label.append(input, swatch, details);
+        if (theme.id === activeTheme) {
+          label.classList.add('active');
+        }
+        themeOptionsContainer.append(label);
+      });
+    }
+
+    function updateActiveThemeCard() {
+      if (!themeOptionsContainer) return;
+      const cards = themeOptionsContainer.querySelectorAll('.theme-card');
+      cards.forEach(card => {
+        const input = card.querySelector('input[name="theme"]');
+        const isActive = input && input.value === activeTheme;
+        card.classList.toggle('active', Boolean(isActive));
+      });
+    }
+
+    applyTheme(activeTheme);
+    renderThemeOptions();
+    updateActiveThemeCard();
 
     let sentences = [];
     let activeMode = 'english';
