@@ -45,6 +45,14 @@
       color: var(--text);
       padding: clamp(1.5rem, 3vw + 1rem, 3rem);
       transition: background 0.4s ease, color 0.4s ease;
+      position: relative;
+    }
+
+    .top-actions {
+      position: absolute;
+      top: clamp(1rem, 2vw + 0.5rem, 2.5rem);
+      right: clamp(1rem, 3vw, 3rem);
+      display: flex;
     }
 
     .practice-shell {
@@ -148,6 +156,13 @@
       color: var(--translation-color);
       opacity: 0.9;
       min-height: 2rem;
+      font-style: normal;
+    }
+
+    .practice-shell.flashcard-mode .translation-output {
+      font-size: clamp(2.6rem, 6vw + 0.8rem, 4.6rem);
+      font-weight: 400;
+      font-style: italic;
     }
 
     .flashcard-row {
@@ -198,17 +213,6 @@
     .support-note {
       font-size: 0.85rem;
       color: var(--text-muted);
-    }
-
-    .missing-config {
-      width: min(600px, 90%);
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: clamp(2rem, 4vw + 1rem, 3rem);
-      text-align: center;
-      display: grid;
-      gap: 1.5rem;
     }
 
     [data-theme='nebula-night'] {
@@ -385,10 +389,12 @@
   </style>
 </head>
 <body>
+  <div class="top-actions" id="topSetupContainer" hidden>
+    <button class="pill-btn" id="topSetupButton" type="button">Go to setup</button>
+  </div>
   <main class="practice-shell" id="practiceShell" hidden>
     <header>
       <h1>Sentence Trainer</h1>
-      <p>Focus on your prompt and keep the projection crisp from any distance.</p>
     </header>
 
     <section class="display-card" aria-live="polite">
@@ -409,12 +415,6 @@
     </section>
   </main>
 
-  <section class="missing-config" id="missingConfig" hidden>
-    <h2>Ready to begin?</h2>
-    <p>Head back to the setup page to load your sentences and preferences, then start practice again.</p>
-    <button class="pill-btn" type="button" onclick="window.location.href='index.html'">Go to setup</button>
-  </section>
-
   <script>
     const CONFIG_KEY = 'sentenceTrainerConfig';
 
@@ -428,28 +428,54 @@
     const speechToggle = document.getElementById('speechToggle');
     const speechSupportNote = document.getElementById('speechSupportNote');
     const practiceShell = document.getElementById('practiceShell');
-    const missingConfig = document.getElementById('missingConfig');
+    const topSetupContainer = document.getElementById('topSetupContainer');
+    const topSetupButton = document.getElementById('topSetupButton');
 
     const modeDescriptions = {
-      english: 'English sentence spotlight',
-      german: 'German sentence spotlight',
       'german-no-vowels': 'German without vowels',
       'german-no-consonants': 'German without consonants',
       initials: 'German initials only',
-      flashcard: 'Flashcard mode'
+      'flashcard-german-first': 'Flashcard (German first)',
+      'flashcard-english-first': 'Flashcard (English first)'
     };
 
     const supportsSpeech =
       'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 
     let sentences = [];
-    let activeMode = 'english';
+    let activeMode = 'german-no-vowels';
     let activeTheme = 'nebula-night';
     let ttsEnabled = false;
     let currentSpeechSegments = [];
     let flashcardTranslationText = '';
     let flashcardRevealSpeechSegments = [];
     let flashcardRevealed = false;
+    let flashcardIndex = 0;
+    let flashcardsCompleted = false;
+
+    const FLASHCARD_MODE_VALUES = ['flashcard-german-first', 'flashcard-english-first'];
+    const FLASHCARD_MODES = new Set(FLASHCARD_MODE_VALUES);
+    const VALID_MODES = new Set([
+      'german-no-vowels',
+      'german-no-consonants',
+      'initials',
+      ...FLASHCARD_MODE_VALUES
+    ]);
+
+    function isFlashcardMode(mode) {
+      return FLASHCARD_MODES.has(mode);
+    }
+
+    function resetFlashcardProgress() {
+      flashcardIndex = 0;
+      flashcardsCompleted = false;
+    }
+
+    if (topSetupButton) {
+      topSetupButton.addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+    }
 
     function applyTheme(themeId) {
       document.documentElement.setAttribute('data-theme', themeId);
@@ -459,7 +485,10 @@
       const stored = sessionStorage.getItem(CONFIG_KEY);
       if (!stored) {
         practiceShell.hidden = true;
-        missingConfig.hidden = false;
+        practiceShell.classList.remove('flashcard-mode');
+        if (topSetupContainer) {
+          topSetupContainer.hidden = false;
+        }
         return false;
       }
 
@@ -467,14 +496,29 @@
         const config = JSON.parse(stored);
         if (!config.sentences || !Array.isArray(config.sentences) || !config.sentences.length) {
           practiceShell.hidden = true;
-          missingConfig.hidden = false;
+          practiceShell.classList.remove('flashcard-mode');
+          if (topSetupContainer) {
+            topSetupContainer.hidden = false;
+          }
           return false;
         }
 
         sentences = config.sentences;
         activeMode = config.mode || activeMode;
+        if (activeMode === 'flashcard') {
+          activeMode = 'flashcard-german-first';
+        } else if (activeMode === 'english') {
+          activeMode = 'flashcard-english-first';
+        } else if (activeMode === 'german') {
+          activeMode = 'flashcard-german-first';
+        }
+        if (!VALID_MODES.has(activeMode)) {
+          activeMode = 'german-no-vowels';
+        }
         activeTheme = config.theme || activeTheme;
         ttsEnabled = supportsSpeech ? Boolean(config.tts) : false;
+        resetFlashcardProgress();
+        practiceShell.classList.toggle('flashcard-mode', isFlashcardMode(activeMode));
         applyTheme(activeTheme);
         speechToggle.textContent = supportsSpeech && ttsEnabled ? 'Speech: On' : 'Speech: Off';
 
@@ -484,21 +528,22 @@
         }
 
         practiceShell.hidden = false;
-        missingConfig.hidden = true;
+        if (topSetupContainer) {
+          topSetupContainer.hidden = true;
+        }
         return true;
       } catch (error) {
         console.warn('Unable to load configuration', error);
         practiceShell.hidden = true;
-        missingConfig.hidden = false;
+        practiceShell.classList.remove('flashcard-mode');
+        if (topSetupContainer) {
+          topSetupContainer.hidden = false;
+        }
         return false;
       }
     }
 
     function transformGerman(sentence, mode) {
-      if (mode === 'german') {
-        return sentence;
-      }
-
       const vowelsRegex = /[aeiouäöüAEIOUÄÖÜ]/g;
       const consonantsRegex = /[bcdfghjklmnpqrstvwxyzßBCDFGHJKLMNPQRSTVWXYZẞ]/g;
       const wordRegex = /[A-Za-zÄÖÜäöüßẞ]+/g;
@@ -518,45 +563,46 @@
       }
     }
 
-    function pickRandomSentence() {
+    function getNextSentence() {
       if (!sentences.length) {
         return null;
       }
-      const index = Math.floor(Math.random() * sentences.length);
-      const selection = sentences[index];
 
-      if (activeMode === 'flashcard') {
-        return {
-          display: selection.german,
-          translation: selection.english,
-          speechSegments: [
-            { text: selection.german, lang: 'de-DE' }
-          ],
-          revealSpeechSegments: [
-            { text: selection.english, lang: 'en-US' }
-          ]
-        };
-      }
+      if (isFlashcardMode(activeMode)) {
+        if (flashcardIndex >= sentences.length) {
+          return { done: true };
+        }
 
-      if (activeMode === 'english') {
+        const selection = sentences[flashcardIndex];
+        flashcardIndex += 1;
+
+        if (activeMode === 'flashcard-german-first') {
+          return {
+            display: selection.german,
+            translation: selection.english,
+            speechSegments: [
+              { text: selection.german, lang: 'de-DE' }
+            ],
+            revealSpeechSegments: [
+              { text: selection.english, lang: 'en-US' }
+            ]
+          };
+        }
+
         return {
           display: selection.english,
-          translation: '',
+          translation: selection.german,
           speechSegments: [
             { text: selection.english, lang: 'en-US' }
-          ]
-        };
-      }
-
-      if (activeMode === 'german') {
-        return {
-          display: selection.german,
-          translation: '',
-          speechSegments: [
+          ],
+          revealSpeechSegments: [
             { text: selection.german, lang: 'de-DE' }
           ]
         };
       }
+
+      const index = Math.floor(Math.random() * sentences.length);
+      const selection = sentences[index];
 
       return {
         display: transformGerman(selection.german, activeMode),
@@ -597,7 +643,7 @@
     }
 
     function updateSentence() {
-      const nextSentence = pickRandomSentence();
+      const nextSentence = getNextSentence();
       if (!nextSentence) {
         sentenceOutput.textContent = 'Add some sentences first!';
         translationOutput.textContent = '';
@@ -613,10 +659,27 @@
         return;
       }
 
+      if (nextSentence.done) {
+        sentenceOutput.textContent = 'All sentences have been displayed.';
+        translationOutput.textContent = '';
+        translationOutput.hidden = true;
+        flashcardRow.hidden = true;
+        currentSpeechSegments = [];
+        flashcardTranslationText = '';
+        flashcardRevealSpeechSegments = [];
+        flashcardRevealed = false;
+        flashcardsCompleted = true;
+        if (supportsSpeech) {
+          window.speechSynthesis.cancel();
+        }
+        return;
+      }
+
       sentenceOutput.textContent = nextSentence.display;
       currentSpeechSegments = nextSentence.speechSegments || [];
+      flashcardsCompleted = false;
 
-      if (activeMode === 'flashcard') {
+      if (isFlashcardMode(activeMode)) {
         flashcardTranslationText = nextSentence.translation || '';
         flashcardRevealSpeechSegments = nextSentence.revealSpeechSegments || [];
         flashcardRevealed = false;
@@ -656,7 +719,7 @@
     }
 
     revealBtn.addEventListener('click', () => {
-      if (activeMode !== 'flashcard') {
+      if (!isFlashcardMode(activeMode)) {
         return;
       }
 
@@ -676,6 +739,9 @@
     });
 
     anotherBtn.addEventListener('click', () => {
+      if (isFlashcardMode(activeMode) && flashcardsCompleted) {
+        resetFlashcardProgress();
+      }
       updateSentence();
     });
 
