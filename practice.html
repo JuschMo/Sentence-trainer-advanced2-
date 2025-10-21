@@ -550,13 +550,13 @@
 
       switch (mode) {
         case 'german-no-vowels':
-          return sentence.replace(vowelsRegex, '*');
+          return sentence.replace(vowelsRegex, '_ ');
         case 'german-no-consonants':
-          return sentence.replace(consonantsRegex, '*');
+          return sentence.replace(consonantsRegex, '_ ');
         case 'initials':
           return sentence.replace(wordRegex, match => {
             if (match.length <= 1) return match;
-            return match[0] + '*'.repeat(match.length - 1);
+            return match[0] + '_ '.repeat(match.length - 1);
           });
         default:
           return sentence;
