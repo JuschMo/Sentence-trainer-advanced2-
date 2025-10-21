@@ -86,6 +86,12 @@
       gap: 1.75rem;
     }
 
+    .helper-text {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
     textarea {
       width: 100%;
       min-height: 220px;
@@ -497,6 +503,7 @@
 
     <section class="panel" aria-labelledby="sentence-input-label">
       <label class="section-title" id="sentence-input-label" for="sentenceInput">Sentence pairs</label>
+      <p class="helper-text">Use the format Target language sentence = English sentence.</p>
       <textarea id="sentenceInput" placeholder="Guten Morgen = Good morning"></textarea>
       <div class="error-message" id="errorMessage" role="alert"></div>
     </section>
@@ -505,15 +512,7 @@
       <label class="section-title" id="mode-label">Sentence options</label>
       <div class="options" id="modeOptions">
         <label class="option-card">
-          <input type="radio" name="mode" value="english" checked />
-          <span>Full sentence in English</span>
-        </label>
-        <label class="option-card">
-          <input type="radio" name="mode" value="german" />
-          <span>Full sentence in German</span>
-        </label>
-        <label class="option-card">
-          <input type="radio" name="mode" value="german-no-vowels" />
+          <input type="radio" name="mode" value="german-no-vowels" checked />
           <span>German without vowels</span>
         </label>
         <label class="option-card">
@@ -525,8 +524,12 @@
           <span>German initials only</span>
         </label>
         <label class="option-card">
-          <input type="radio" name="mode" value="flashcard" />
-          <span>Flashcard mode</span>
+          <input type="radio" name="mode" value="flashcard-german-first" />
+          <span>Flashcard German first</span>
+        </label>
+        <label class="option-card">
+          <input type="radio" name="mode" value="flashcard-english-first" />
+          <span>Flashcard English first</span>
         </label>
       </div>
     </section>
@@ -681,14 +684,14 @@
         .map(line => {
           const separatorIndex = line.indexOf('=');
           if (separatorIndex === -1) {
-            throw new Error('Each line must contain a German sentence, an equal sign, and an English translation.');
+            throw new Error('Each line must contain a target sentence, an equal sign, and an English translation.');
           }
 
           const german = line.slice(0, separatorIndex).trim();
           const english = line.slice(separatorIndex + 1).trim();
 
           if (!german || !english) {
-            throw new Error('Each line must contain words on both sides of the equal sign.');
+            throw new Error('Each line must contain text on both sides of the equal sign.');
           }
 
           return { german, english };
@@ -721,9 +724,22 @@
           sentenceInput.value = config.rawInput;
         }
         if (config.mode) {
-          const modeInput = document.querySelector(`input[name="mode"][value="${config.mode}"]`);
+          let modeValue = config.mode;
+          if (modeValue === 'flashcard') {
+            modeValue = 'flashcard-german-first';
+          } else if (modeValue === 'english') {
+            modeValue = 'flashcard-english-first';
+          } else if (modeValue === 'german') {
+            modeValue = 'flashcard-german-first';
+          }
+          const modeInput = document.querySelector(`input[name="mode"][value="${modeValue}"]`);
           if (modeInput) {
             modeInput.checked = true;
+          } else {
+            const defaultMode = document.querySelector('input[name="mode"][value="german-no-vowels"]');
+            if (defaultMode) {
+              defaultMode.checked = true;
+            }
           }
         }
         if (config.theme) {
@@ -768,7 +784,7 @@
         }
 
         const selectedMode = document.querySelector('input[name="mode"]:checked');
-        const activeMode = selectedMode ? selectedMode.value : 'english';
+        const activeMode = selectedMode ? selectedMode.value : 'german-no-vowels';
 
         const config = {
           sentences,
