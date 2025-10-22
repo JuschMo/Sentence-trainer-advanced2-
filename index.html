@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,36 +6,193 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sentence Trainer Setup</title>
   <style>
-    body {
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
-      color: #f9fafb;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+    :root {
+      --color-scheme: dark;
+      color-scheme: var(--color-scheme, light dark);
+      --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
+      --card-bg: rgba(17, 24, 39, 0.8);
+      --text: #f9fafb;
+      --muted: rgba(255,255,255,0.75);
+      --surface: rgba(15,23,42,0.6);
+      --border: rgba(148,163,184,0.25);
+      --accent: #38bdf8;
+      --accent-dark: #0ea5e9;
+      --button-text: #0f172a;
     }
-    .app-shell {
-      background: rgba(17, 24, 39, 0.8);
-      border-radius: 20px;
-      padding: 2rem;
-      width: min(800px, 95%);
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+
+    /* THEMES */
+    [data-theme='nebula-night'] { --color-scheme: dark; --bg-gradient: linear-gradient(135deg,#111827,#1f2937 45%,#312e81); --card-bg: rgba(17,24,39,0.8); --text:#f9fafb; --muted:rgba(255,255,255,0.75); --surface: rgba(15,23,42,0.6); --border: rgba(148,163,184,0.25); --accent:#38bdf8; --accent-dark:#0ea5e9; --button-text:#0f172a; }
+    [data-theme='crisp-white'] { --color-scheme: light; --bg-gradient: linear-gradient(135deg,#ffffff,#f1f5f9); --card-bg: rgba(255,255,255,0.92); --text:#111827; --muted:#475569; --surface: rgba(241,245,249,0.85); --border: rgba(15,23,42,0.12); --accent:#2563eb; --accent-dark:#1d4ed8; --button-text:#f8fafc; }
+    [data-theme='contrast-black'] { --color-scheme: dark; --bg-gradient: linear-gradient(135deg,#000,#111827); --card-bg: rgba(10,10,12,0.9); --text:#f9fafb; --muted:rgba(226,232,240,0.8); --surface: rgba(17,24,39,0.7); --border: rgba(148,163,184,0.35); --accent:#f97316; --accent-dark:#ea580c; --button-text:#111827; }
+    [data-theme='ocean-teal'] { --color-scheme: dark; --bg-gradient: linear-gradient(135deg,#0f172a,#0d9488); --card-bg: rgba(15,23,42,0.78); --text:#ecfeff; --muted:rgba(207,250,254,0.8); --surface: rgba(8,47,73,0.65); --border: rgba(94,234,212,0.25); --accent:#2dd4bf; --accent-dark:#14b8a6; --button-text:#042f2e; }
+    [data-theme='sunrise-gold'] { --color-scheme: light; --bg-gradient: linear-gradient(135deg,#fff7ed,#fed7aa 55%,#fbbf24); --card-bg: rgba(255,247,237,0.92); --text:#7c2d12; --muted:rgba(120,53,15,0.85); --surface: rgba(255,237,213,0.9); --border: rgba(124,45,18,0.18); --accent:#d97706; --accent-dark:#b45309; --button-text:#fff7ed; }
+    [data-theme='forest-focus'] { --color-scheme: dark; --bg-gradient: linear-gradient(135deg,#052e16,#064e3b 50%,#1e3a8a); --card-bg: rgba(6,78,59,0.78); --text:#ecfdf5; --muted:rgba(209,250,229,0.85); --surface: rgba(4,47,29,0.65); --border: rgba(74,222,128,0.3); --accent:#22c55e; --accent-dark:#16a34a; --button-text:#052e16; }
+    [data-theme='royal-plum'] { --color-scheme: dark; --bg-gradient: linear-gradient(135deg,#2e1065,#6d28d9 55%,#be185d); --card-bg: rgba(46,16,101,0.82); --text:#fdf4ff; --muted:rgba(248,209,255,0.85); --surface: rgba(76,29,149,0.65); --border: rgba(216,180,254,0.35); --accent:#f472b6; --accent-dark:#ec4899; --button-text:#4c0519; }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; background: var(--bg-gradient); color: var(--text); padding: 2rem; }
+    .app-shell { width: min(1000px,95%); background: var(--card-bg); border: 1px solid var(--border); border-radius: 22px; padding: 2rem; box-shadow: 0 30px 80px rgba(0,0,0,0.5); display: grid; gap: 1.25rem; }
+    h1 { margin: 0; text-transform: uppercase; }
+    p { margin: 0; color: var(--muted); }
+    textarea { width: 100%; min-height: 220px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 14px; padding: 1rem; font-size: 1.05rem; }
+    .section-title { font-weight: 700; text-transform: uppercase; font-size: 0.95rem; letter-spacing: .05em; }
+    .options { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: .75rem; }
+    .option-card { border: 1px solid var(--border); background: var(--surface); border-radius: 14px; padding: .9rem 1rem; display: flex; gap: .6rem; align-items: flex-start; }
+    .theme-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: .75rem; }
+    .theme-card { border: 1px solid var(--border); background: var(--surface); border-radius: 14px; padding: .9rem 1rem; display: flex; gap: .8rem; align-items: center; cursor: pointer; }
+    .theme-card input { transform: scale(1.2); }
+    .theme-swatch { width: 44px; height: 44px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.08); }
+
+    button { background: var(--accent); color: var(--button-text); border: none; border-radius: 999px; padding: 1rem 2.25rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; justify-self: start; }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header>
+      <h1>Sentence Trainer</h1>
+      <p>Load your sentence pairs, choose a mode, and pick a colour theme.</p>
+    </header>
+
+    <section>
+      <label class="section-title" for="sentenceInput">Sentence pairs</label>
+      <p style="margin:.25rem 0 0.75rem">Format: <em>German = English</em></p>
+      <textarea id="sentenceInput" placeholder="Guten Morgen = Good morning"></textarea>
+      <div id="errorMessage" style="color:#f87171; display:none; margin-top:.5rem; font-weight:700"></div>
+    </section>
+
+    <section>
+      <div class="section-title">Practice mode</div>
+      <div class="options">
+        <label class="option-card"><input type="radio" name="mode" value="german-no-vowels" checked> German without vowels</label>
+        <label class="option-card"><input type="radio" name="mode" value="german-no-consonants"> German without consonants</label>
+        <label class="option-card"><input type="radio" name="mode" value="initials"> German initials only</label>
+        <label class="option-card"><input type="radio" name="mode" value="flashcard-german-first"> Flashcard (German first)</label>
+        <label class="option-card"><input type="radio" name="mode" value="flashcard-english-first"> Flashcard (English first)</label>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">Audio & presentation</div>
+      <div class="options">
+        <label class="option-card"><input type="checkbox" id="ttsToggle"> Text to speech</label>
+        <label class="option-card"><input type="checkbox" id="listeningOnlyToggle"> Listening only</label>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">Colour themes</div>
+      <div class="theme-grid" id="themeOptions"></div>
+    </section>
+
+    <button id="startBtn">Start practice</button>
+  </main>
+
+  <script>
+    const CONFIG_KEY = 'sentenceTrainerConfig';
+    const sentenceInput = document.getElementById('sentenceInput');
+    const startBtn = document.getElementById('startBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const themeOptions = document.getElementById('themeOptions');
+    const ttsToggle = document.getElementById('ttsToggle');
+    const listeningOnlyToggle = document.getElementById('listeningOnlyToggle');
+
+    const themes = [
+      { id: 'nebula-night', name: 'Nebula Night', swatch: ['#111827','#312e81','#38bdf8'], desc:'Electric midnight blues with cyan.' },
+      { id: 'crisp-white', name: 'Crisp White', swatch: ['#ffffff','#e2e8f0','#2563eb'], desc:'Bright white with crisp accents.' },
+      { id: 'contrast-black', name: 'Contrast Black', swatch: ['#000000','#111827','#f97316'], desc:'Deep black with punchy orange.' },
+      { id: 'ocean-teal', name: 'Ocean Teal', swatch: ['#0f172a','#0d9488','#2dd4bf'], desc:'Marine greens with luminous teal.' },
+      { id: 'sunrise-gold', name: 'Sunrise Gold', swatch: ['#fff7ed','#fbbf24','#d97706'], desc:'Warm amber sunrise palette.' },
+      { id: 'forest-focus', name: 'Forest Focus', swatch: ['#052e16','#16a34a','#22c55e'], desc:'Evergreen depth with lime.' },
+      { id: 'royal-plum', name: 'Royal Plum', swatch: ['#2e1065','#6d28d9','#f472b6'], desc:'Vivid purples with magenta.' }
+    ];
+
+    let activeTheme = 'nebula-night';
+
+    function applyTheme(id){ activeTheme = id; document.documentElement.setAttribute('data-theme', id); persist({ theme:id }); }
+
+    function renderThemes(){
+      themeOptions.innerHTML = '';
+      themes.forEach(t => {
+        const label = document.createElement('label');
+        label.className = 'theme-card';
+        const input = document.createElement('input');
+        input.type = 'radio'; input.name = 'theme'; input.value = t.id; input.checked = t.id===activeTheme;
+        input.addEventListener('change',()=> applyTheme(t.id));
+        const sw = document.createElement('div'); sw.className='theme-swatch';
+        sw.style.background = `linear-gradient(135deg, ${t.swatch.join(',')})`;
+        const details = document.createElement('div');
+        details.innerHTML = `<div style="font-weight:700">${t.name}</div><div style="color:var(--muted); font-size:.95rem">${t.desc}</div>`;
+        label.append(input, sw, details);
+        themeOptions.append(label);
+      });
     }
-    textarea {
-      width: 100%;
-      min-height: 200px;
-      border-radius: 12px;
-      border: none;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      font-size: 1.1rem;
-      background: rgba(15, 23, 42, 0.6);
-      color: #fff;
+
+    function parseLines(raw){
+      return raw.split(/\n+/).map(l=>l.trim()).filter(Boolean).map(l=>{
+        const i = l.indexOf('=');
+        if(i===-1) throw new Error('Each line needs "German = English".');
+        const german = l.slice(0,i).trim();
+        const english = l.slice(i+1).trim();
+        if(!german || !english) throw new Error('Text on both sides of = required.');
+        return { german, english };
+      });
     }
-    button {
-      background: #38bdf8;
+
+    function persist(partial={}){
+      try{
+        const cur = JSON.parse(sessionStorage.getItem(CONFIG_KEY) || '{}');
+        const next = { ...cur, ...partial };
+        sessionStorage.setItem(CONFIG_KEY, JSON.stringify(next));
+      }catch{}
+    }
+
+    function restore(){
+      const cur = (()=>{ try{return JSON.parse(sessionStorage.getItem(CONFIG_KEY)||'{}')}catch{return {}} })();
+      if(cur.theme) { activeTheme = cur.theme; }
+      applyTheme(activeTheme);
+      renderThemes();
+
+      // Restore sentences
+      if (cur.rawInput) {
+        sentenceInput.value = cur.rawInput;
+      } else if (Array.isArray(cur.sentences) && cur.sentences.length){
+        sentenceInput.value = cur.sentences.map(s=>`${s.german} = ${s.english}`).join('\n');
+      }
+
+      // Restore toggles and mode
+      if (typeof cur.tts === 'boolean') ttsToggle.checked = cur.tts;
+      if (typeof cur.listeningOnly === 'boolean') listeningOnlyToggle.checked = cur.listeningOnly;
+      if (cur.mode) {
+        const m = document.querySelector(`input[name="mode"][value="${cur.mode}"]`);
+        if (m) m.checked = true;
+      }
+    }
+
+    restore();
+
+    // Persist toggle changes live
+    ttsToggle.addEventListener('change',()=>persist({ tts: ttsToggle.checked }));
+    listeningOnlyToggle.addEventListener('change',()=>persist({ listeningOnly: listeningOnlyToggle.checked }));
+    document.querySelectorAll('input[name="mode"]').forEach(el=> el.addEventListener('change',()=>persist({ mode: el.value })));
+
+    startBtn.addEventListener('click', ()=>{
+      try{
+        const sentences = parseLines(sentenceInput.value);
+        const mode = (document.querySelector('input[name="mode"]:checked')||{}).value || 'german-no-vowels';
+        const tts = ttsToggle.checked;
+        const listeningOnly = listeningOnlyToggle.checked;
+        const config = { sentences, mode, theme: activeTheme, tts, listeningOnly, rawInput: sentenceInput.value };
+        sessionStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+        errorMessage.style.display = 'none';
+        window.location.href = 'practice.html';
+      }catch(err){
+        errorMessage.textContent = err.message || 'Please fix your input.';
+        errorMessage.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>      background: #38bdf8;
       border: none;
       border-radius: 50px;
       padding: 1rem 2rem;
