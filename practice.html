@@ -14,14 +14,17 @@
       align-items: center;
       height: 100vh;
       margin: 0;
+      position: relative;
     }
     .practice-shell {
       background: rgba(17, 24, 39, 0.85);
       border-radius: 24px;
       padding: 3rem;
-      width: min(900px, 95%);
+      width: min(1000px, 95%);
       text-align: center;
       box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+      display: grid;
+      gap: 1.25rem;
     }
     button {
       background: #38bdf8;
@@ -36,64 +39,210 @@
       margin: 0.5rem;
     }
     .sentence-output {
-      font-size: 3rem;
-      font-weight: 700;
-      margin: 1.5rem 0;
+      font-size: 2.4rem; /* SAME SIZE as translation */
+      font-weight: 700;   /* Bold for German */
+      margin: 1.2rem 0 0.2rem;
+      line-height: 1.25;
     }
     .translation-output {
-      font-size: 1.6rem;
-      opacity: 0.9;
+      font-size: 2.4rem;   /* SAME SIZE as German */
+      font-style: italic;  /* Italic for English */
+      font-weight: normal; /* Not bold */
+      opacity: 0.95;
+      min-height: 2.4rem;
     }
+    .controls { display: flex; justify-content: center; gap: .5rem; flex-wrap: wrap; }
+    .top-actions { position: absolute; top: 2rem; right: 2rem; }
+    .support-note { font-size: .9rem; opacity: .75; }
   </style>
 </head>
 <body>
+  <div class="top-actions">
+    <button id="backBtn">Back to setup</button>
+  </div>
   <main class="practice-shell" id="practiceShell">
     <h1>Sentence Trainer</h1>
+    <div class="mode-line" id="modeLine"></div>
     <div class="sentence-output" id="sentenceOutput">Loading…</div>
     <div class="translation-output" id="translationOutput"></div>
-    <div>
-      <button id="revealBtn">Reveal translation</button>
+    <div class="controls">
+      <button id="revealBtn" hidden>Reveal translation</button>
       <button id="anotherBtn">Another sentence</button>
     </div>
+    <div class="support-note" id="speechNote" hidden>Speech synthesis is unavailable in this browser.</div>
   </main>
 
   <script>
     const CONFIG_KEY = 'sentenceTrainerConfig';
-    const config = JSON.parse(sessionStorage.getItem(CONFIG_KEY));
+    const supportsSpeech = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 
+    // UI
     const sentenceOutput = document.getElementById('sentenceOutput');
     const translationOutput = document.getElementById('translationOutput');
     const revealBtn = document.getElementById('revealBtn');
     const anotherBtn = document.getElementById('anotherBtn');
+    const backBtn = document.getElementById('backBtn');
+    const modeLine = document.getElementById('modeLine');
+    const speechNote = document.getElementById('speechNote');
 
-    let index = 0;
+    // Load config
+    const config = (() => {
+      try { return JSON.parse(sessionStorage.getItem(CONFIG_KEY)) || {}; } catch { return {}; }
+    })();
 
-    function showSentence() {
-      if (index >= config.sentences.length) index = 0;
-      const s = config.sentences[index++];
-      if (config.listeningOnly) {
-        translationOutput.textContent = '';
-      } else {
-        translationOutput.textContent = s.english;
-      }
-      sentenceOutput.textContent = s.german;
+    const sentences = Array.isArray(config.sentences) ? config.sentences : [];
+    let mode = config.mode || 'german-no-vowels';
+    const listeningOnly = Boolean(config.listeningOnly);
+    const ttsEnabled = supportsSpeech && Boolean(config.tts);
 
-      if (config.tts) {
-        const utter = new SpeechSynthesisUtterance(s.german);
-        utter.lang = 'de-DE';
-        speechSynthesis.speak(utter);
+    if (!supportsSpeech) speechNote.hidden = false;
+
+    // --- Mode helpers ---
+    const FLASH_G_FIRST = 'flashcard-german-first';
+    const FLASH_E_FIRST = 'flashcard-english-first';
+    const isFlashcard = (m) => m === FLASH_G_FIRST || m === FLASH_E_FIRST;
+
+    const modeLabels = {
+      'german-no-vowels': 'German without vowels',
+      'german-no-consonants': 'German without consonants',
+      'initials': 'German initials only',
+      [FLASH_G_FIRST]: 'Flashcard (German first)',
+      [FLASH_E_FIRST]: 'Flashcard (English first)'
+    };
+
+    modeLine.textContent = modeLabels[mode] || '';
+
+    function transformGerman(sentence, m) {
+      const vowels = /[aeiouäöüAEIOUÄÖÜ]/g;
+      const consonants = /[bcdfghjklmnpqrstvwxyzßBCDFGHJKLMNPQRSTVWXYZẞ]/g;
+      const words = /[A-Za-zÄÖÜäöüßẞ]+/g;
+      switch (m) {
+        case 'german-no-vowels':      return sentence.replace(vowels, '_ ');
+        case 'german-no-consonants':  return sentence.replace(consonants, '_ ');
+        case 'initials':              return sentence.replace(words, w => w.length<=1 ? w : w[0] + '_ '.repeat(w.length-1));
+        default: return sentence;
       }
     }
 
+    // State
+    let index = 0;           // for sequential flashcards
+    let revealShown = false; // only used in flashcard modes
+
+    function pickNext() {
+      if (!sentences.length) return null;
+
+      if (isFlashcard(mode)) {
+        if (index >= sentences.length) index = 0; // simple wrap-around deck
+        const s = sentences[index++];
+        if (mode === FLASH_G_FIRST) {
+          return {
+            display: s.german,
+            translation: s.english,
+            speakDisplay: { text: s.german, lang: 'de-DE' },
+            speakReveal:   { text: s.english, lang: 'en-US' }
+          };
+        } else { // English first
+          return {
+            display: s.english,
+            translation: s.german,
+            speakDisplay: { text: s.english, lang: 'en-US' },
+            speakReveal:   { text: s.german, lang: 'de-DE' }
+          };
+        }
+      }
+
+      // Transform modes work on the German side
+      const rand = Math.floor(Math.random() * sentences.length);
+      const s = sentences[rand];
+      return {
+        display: transformGerman(s.german, mode),
+        translation: s.english,
+        speakGerman: { text: s.german, lang: 'de-DE' },
+        speakEnglish:{ text: s.english, lang: 'en-US' }
+      };
+    }
+
+    function speak(segments) {
+      if (!ttsEnabled || !supportsSpeech) return;
+      window.speechSynthesis.cancel();
+      const list = Array.isArray(segments) ? segments : [segments];
+      for (const seg of list) {
+        if (!seg || !seg.text) continue;
+        const u = new SpeechSynthesisUtterance(seg.text);
+        if (seg.lang) u.lang = seg.lang;
+        u.rate = 0.95;
+        window.speechSynthesis.speak(u);
+      }
+    }
+
+    function showNext() {
+      const next = pickNext();
+      if (!next) {
+        sentenceOutput.textContent = 'Add some sentences first on the setup page!';
+        translationOutput.textContent = '';
+        revealBtn.hidden = true;
+        return;
+      }
+
+      // Display line
+      sentenceOutput.textContent = next.display;
+
+      // Non-flashcard: show/hide translation based on listeningOnly
+      if (!isFlashcard(mode)) {
+        revealBtn.hidden = true; // no reveal button in transform modes
+        translationOutput.textContent = listeningOnly ? '' : (next.translation || '');
+        if (!listeningOnly) {
+          speak([ next.speakGerman, next.speakEnglish ]);
+        } else {
+          speak(next.speakGerman);
+        }
+        return;
+      }
+
+      // Flashcard modes
+      revealShown = false;
+      translationOutput.textContent = '';
+      revealBtn.hidden = false;
+      revealBtn.textContent = 'Reveal translation';
+
+      // Speak only the prompt side in flashcards
+      if (!listeningOnly) {
+        speak(next.speakDisplay);
+      } else {
+        // listening-only still speaks the prompt side (target of display)
+        speak(next.speakDisplay);
+      }
+
+      // Store for reveal handler
+      revealBtn._current = next;
+    }
+
     revealBtn.addEventListener('click', () => {
-      if (!config.listeningOnly) {
-        translationOutput.style.display = translationOutput.style.display === 'none' ? 'block' : 'none';
+      if (revealBtn.hidden || !revealBtn._current) return;
+      revealShown = !revealShown;
+      if (revealShown) {
+        translationOutput.textContent = listeningOnly ? '' : (revealBtn._current.translation || '');
+        revealBtn.textContent = listeningOnly ? 'Reveal translation' : 'Hide translation';
+        if (!listeningOnly) speak(revealBtn._current.speakReveal);
+      } else {
+        translationOutput.textContent = '';
+        revealBtn.textContent = 'Reveal translation';
+        // Re-speak the prompt when hiding
+        speak(revealBtn._current.speakDisplay);
       }
     });
 
-    anotherBtn.addEventListener('click', showSentence);
+    anotherBtn.addEventListener('click', () => {
+      showNext();
+    });
 
-    showSentence();
+    backBtn.addEventListener('click', () => {
+      if (supportsSpeech) window.speechSynthesis.cancel();
+      window.location.href = 'index.html';
+    });
+
+    // Kick off
+    showNext();
   </script>
 </body>
 </html>
