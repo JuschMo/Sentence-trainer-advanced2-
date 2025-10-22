@@ -264,5 +264,55 @@
     // Kick off
     showNext();
   </script>
+  <html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentence Trainer Practice</title>
+  <style>
+    :root { --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81); --text:#f9fafb; --card-bg: rgba(17,24,39,0.85); }
+    [data-theme='crisp-white'] { --bg-gradient: linear-gradient(135deg,#ffffff,#f1f5f9); --text:#ffffff; --card-bg: rgba(30,41,59,0.95); }
+    [data-theme='contrast-black']{ --bg-gradient: linear-gradient(135deg,#000,#111827); --text:#f9fafb; --card-bg: rgba(17,24,39,0.9); }
+    [data-theme='ocean-teal']{ --bg-gradient: linear-gradient(135deg,#0f172a,#0d9488); --text:#ecfeff; --card-bg: rgba(15,23,42,0.78); }
+    [data-theme='sunrise-gold']{ --bg-gradient: linear-gradient(135deg,#fff7ed,#fed7aa 55%,#fbbf24); --text:#7c2d12; --card-bg: #fff9d9; }
+    [data-theme='forest-focus']{ --bg-gradient: linear-gradient(135deg,#052e16,#064e3b 50%,#1e3a8a); --text:#ecfdf5; --card-bg: rgba(6,78,59,0.78); }
+    [data-theme='royal-plum']{ --bg-gradient: linear-gradient(135deg,#2e1065,#6d28d9 55%,#be185d); --text:#fdf4ff; --card-bg: rgba(46,16,101,0.82); }
+
+    body { font-family: 'Inter','Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,sans-serif; margin:0; min-height:100vh; display:flex; justify-content:center; align-items:center; background: var(--bg-gradient); color: var(--text); position:relative; }
+    .practice-shell { background: var(--card-bg); border-radius: 24px; padding: 3rem; width: min(1000px,95%); text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,0.6); display: grid; gap: 1.25rem; }
+    button { background: #38bdf8; border: none; border-radius: 999px; padding: 0.75rem 1.1rem; font-size: 1rem; font-weight: 700; text-transform: uppercase; color: #0f172a; cursor: pointer; margin: 0.35rem; }
+    .btn-secondary { background: transparent; border: 1px solid rgba(148,163,184,0.35); color: var(--text); }
+    .sentence-output { font-size: 2.4rem; font-weight: 700; margin: 1.2rem 0 0.2rem; line-height: 1.25; }
+    .translation-output { font-size: 2.4rem; font-style: italic; font-weight: normal; opacity: 0.95; min-height: 2.4rem; }
+    .controls { display:flex; justify-content:center; gap:.35rem; flex-wrap:wrap; align-items:center; }
+    .flash-controls { display:flex; gap:.35rem; }
+    .top-actions { position:absolute; top:2rem; right:2rem; }
+    .support-note { font-size:.9rem; opacity:.75; }
+    .meta { font-size:.9rem; opacity:.85; }
+  </style>
+</head>
+<body>
+  <div class="top-actions">
+    <button id="backBtn">Back to setup</button>
+  </div>
+  <main class="practice-shell" id="practiceShell">
+    <h1>Sentence Trainer</h1>
+    <div class="mode-line" id="modeLine"></div>
+    <div class="sentence-output" id="sentenceOutput">Loading…</div>
+    <div class="translation-output" id="translationOutput"></div>
+    <div class="controls">
+      <div class="flash-controls" id="flashControls" hidden>
+        <button id="againBtn" class="btn-secondary" title="Mark as not learned">✗ Again</button>
+        <button id="gotItBtn" class="btn-secondary" title="Mark as learned">✓ Got it</button>
+      </div>
+      <button id="revealBtn">Reveal translation</button>
+      <button id="anotherBtn">Another sentence</button>
+    </div>
+    <div class="meta" id="progressMeta" hidden>Card 1 / 1</div>
+    <div class="support-note" id="speechNote" hidden>Speech synthesis is unavailable in this browser.</div>
+  </main>
+</body>
+</html>
+
 </body>
 </html>
