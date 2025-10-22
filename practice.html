@@ -1,5 +1,3 @@
-<!-- index.html and practice.html unchanged except color refinements -->
-<!-- practice.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,5 +46,136 @@
     <div class="meta" id="progressMeta" hidden>Card 1 / 1</div>
     <div class="support-note" id="speechNote" hidden>Speech synthesis is unavailable in this browser.</div>
   </main>
+
+  <script>
+    const CONFIG_KEY = 'sentenceTrainerConfig';
+    const sentenceOutput = document.getElementById('sentenceOutput');
+    const translationOutput = document.getElementById('translationOutput');
+    const revealBtn = document.getElementById('revealBtn');
+    const anotherBtn = document.getElementById('anotherBtn');
+    const backBtn = document.getElementById('backBtn');
+    const flashControls = document.getElementById('flashControls');
+    const againBtn = document.getElementById('againBtn');
+    const gotItBtn = document.getElementById('gotItBtn');
+    const progressMeta = document.getElementById('progressMeta');
+
+    const supportsSpeech = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+
+    let sentences = [];
+    let activeMode = 'german-no-vowels';
+    let activeTheme = 'nebula-night';
+    let ttsEnabled = false;
+    let currentIndex = 0;
+    let flashcardQueue = [];
+    let againQueue = [];
+    let round = 1;
+    let currentSentence = null;
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+
+    function speak(text, lang) {
+      if (!supportsSpeech || !ttsEnabled) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang;
+      utter.rate = 0.95;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function transformGerman(sentence, mode) {
+      const vowels = /[aeiouäöüAEIOUÄÖÜ]/g;
+      const consonants = /[bcdfghjklmnpqrstvwxyzßBCDFGHJKLMNPQRSTVWXYZẞ]/g;
+      const words = /[A-Za-zÄÖÜäöüßẞ]+/g;
+      switch (mode) {
+        case 'german-no-vowels': return sentence.replace(vowels, '_');
+        case 'german-no-consonants': return sentence.replace(consonants, '_');
+        case 'initials': return sentence.replace(words, w => w[0] + '_'.repeat(w.length-1));
+        default: return sentence;
+      }
+    }
+
+    function loadConfig() {
+      const stored = sessionStorage.getItem(CONFIG_KEY);
+      if (!stored) return;
+      const cfg = JSON.parse(stored);
+      sentences = cfg.sentences || [];
+      activeMode = cfg.mode || 'german-no-vowels';
+      activeTheme = cfg.theme || 'nebula-night';
+      ttsEnabled = cfg.tts || false;
+      applyTheme(activeTheme);
+    }
+
+    function updateProgress() {
+      if (!sentences.length) return;
+      progressMeta.hidden = false;
+      progressMeta.textContent = `Card ${currentIndex+1} / ${sentences.length} · Round ${round}`;
+    }
+
+    function nextSentence() {
+      if (currentIndex >= sentences.length) {
+        if (againQueue.length) {
+          sentences = againQueue.splice(0);
+          currentIndex = 0;
+          round++;
+          updateProgress();
+          nextSentence();
+          return;
+        }
+        sentenceOutput.textContent = 'All sentences complete!';
+        translationOutput.textContent = '';
+        flashControls.hidden = true;
+        return;
+      }
+      currentSentence = sentences[currentIndex];
+      updateProgress();
+      showSentence();
+    }
+
+    function showSentence() {
+      const { german, english } = currentSentence;
+      if (['flashcard-german-first','flashcard-english-first'].includes(activeMode)) {
+        flashControls.hidden = false;
+        revealBtn.hidden = false;
+        const isGermanFirst = activeMode==='flashcard-german-first';
+        const shown = isGermanFirst ? german : english;
+        const hidden = isGermanFirst ? english : german;
+        sentenceOutput.textContent = shown;
+        translationOutput.textContent = '';
+        speak(shown, isGermanFirst ? 'de-DE' : 'en-US');
+        revealBtn.onclick = ()=>{
+          if (translationOutput.textContent==='') {
+            translationOutput.textContent = hidden;
+            speak(hidden, isGermanFirst ? 'en-US' : 'de-DE');
+          } else {
+            translationOutput.textContent = '';
+            speak(shown, isGermanFirst ? 'de-DE' : 'en-US');
+          }
+        };
+      } else {
+        flashControls.hidden = true;
+        revealBtn.hidden = false;
+        const transformed = transformGerman(german, activeMode);
+        sentenceOutput.textContent = transformed;
+        translationOutput.textContent = '';
+        speak(german, 'de-DE');
+        revealBtn.onclick = ()=>{
+          if (translationOutput.textContent==='') translationOutput.textContent = english; else translationOutput.textContent = '';
+        };
+      }
+    }
+
+    anotherBtn.onclick = ()=>{ currentIndex++; nextSentence(); };
+    gotItBtn.onclick = ()=>{ currentIndex++; nextSentence(); };
+    againBtn.onclick = ()=>{ againQueue.push(currentSentence); currentIndex++; nextSentence(); };
+
+    backBtn.onclick = ()=>{
+      sessionStorage.setItem(CONFIG_KEY, JSON.stringify({sentences, mode:activeMode, theme:activeTheme, tts:ttsEnabled}));
+      window.location.href='index.html';
+    };
+
+    loadConfig();
+    nextSentence();
+  </script>
 </body>
 </html>
