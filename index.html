@@ -6,634 +6,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sentence Trainer Setup</title>
   <style>
-    :root {
-      --color-scheme: dark;
-      color-scheme: var(--color-scheme, light dark);
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
-      --card-bg: rgba(17, 24, 39, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --surface-bg: rgba(15, 23, 42, 0.55);
-      --surface-border: rgba(148, 163, 184, 0.25);
-      --switch-track: rgba(148, 163, 184, 0.3);
-      --switch-thumb: #0f172a;
-      --accent: #38bdf8;
-      --accent-dark: #0ea5e9;
-      --text: #f9fafb;
-      --text-muted: rgba(255, 255, 255, 0.7);
-      --button-text: #0f172a;
-      --focus-ring: rgba(56, 189, 248, 0.25);
-      --option-hover-shadow: rgba(8, 145, 178, 0.2);
-      --secondary-button-bg: transparent;
-      --secondary-button-border: rgba(148, 163, 184, 0.3);
-      --secondary-button-text: rgba(248, 250, 252, 0.75);
-      --secondary-button-hover-bg: rgba(148, 163, 184, 0.1);
-      --secondary-button-hover-text: #f1f5f9;
-      --swatch-border: rgba(255, 255, 255, 0.08);
-    }
-
-    * { box-sizing: border-box; }
-
     body {
-      margin: 0;
-      min-height: 100vh;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
+      color: #f9fafb;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: var(--bg-gradient);
-      color: var(--text);
-      padding: clamp(1.5rem, 3vw + 1rem, 3rem);
-      transition: background 0.4s ease, color 0.4s ease;
+      height: 100vh;
+      margin: 0;
     }
-
     .app-shell {
-      width: min(1100px, 100%);
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(22px);
-      padding: clamp(2rem, 3vw + 1rem, 3.5rem);
-      display: grid;
-      gap: clamp(2rem, 2vw + 1rem, 3rem);
+      background: rgba(17, 24, 39, 0.8);
+      border-radius: 20px;
+      padding: 2rem;
+      width: min(800px, 95%);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
     }
-
-    header { display: flex; flex-direction: column; gap: 0.5rem; }
-
-    header h1 {
-      margin: 0;
-      font-size: clamp(2.4rem, 4vw + 1rem, 4rem);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    header p {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: clamp(1.05rem, 1vw + 1rem, 1.35rem);
-      max-width: 720px;
-      line-height: 1.5;
-    }
-
-    .panel { display: flex; flex-direction: column; gap: 1.75rem; }
-    .helper-text { margin: 0; color: var(--text-muted); font-size: 0.95rem; }
-
     textarea {
       width: 100%;
-      min-height: 220px;
-      resize: vertical;
-      background: var(--surface-bg);
-      border: 1px solid var(--surface-border);
-      border-radius: 16px;
-      color: var(--text);
+      min-height: 200px;
+      border-radius: 12px;
+      border: none;
+      padding: 1rem;
+      margin-bottom: 1rem;
       font-size: 1.1rem;
-      line-height: 1.7;
-      padding: 1.25rem 1.5rem;
-      transition: border 0.2s ease, box-shadow 0.2s ease;
+      background: rgba(15, 23, 42, 0.6);
+      color: #fff;
     }
-
-    textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--focus-ring);
-    }
-
-    label.section-title { font-weight: 700; font-size: 1.05rem; letter-spacing: 0.04em; text-transform: uppercase; }
-
-    .options { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-
-    .option-card {
-      border: 1px solid var(--surface-border);
-      border-radius: 18px;
-      padding: 1.2rem 1.4rem;
-      background: var(--surface-bg);
-      display: flex; align-items: flex-start; gap: 0.85rem;
-      cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .option-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 18px 40px var(--option-hover-shadow); }
-    .option-card input { transform: scale(1.2); margin-top: 0.3rem; }
-    .option-card span { font-size: 1.1rem; font-weight: 600; }
-
-    .theme-grid { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-
-    .theme-card {
-      border: 1px solid var(--surface-border);
-      border-radius: 18px;
-      padding: 1.1rem 1.25rem;
-      background: var(--surface-bg);
-      display: flex; align-items: center; gap: 1rem;
-      cursor: pointer;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .theme-card.active { border-color: var(--accent); box-shadow: 0 16px 32px var(--option-hover-shadow); }
-    .theme-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 16px 32px var(--option-hover-shadow); }
-    .theme-card input { transform: scale(1.2); }
-
-    .theme-details { display: flex; flex-direction: column; gap: 0.25rem; }
-    .theme-details strong { font-size: 1.05rem; }
-    .theme-details span { color: var(--text-muted); font-size: 0.95rem; }
-
-    .theme-swatch { width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0; border: 2px solid var(--swatch-border); }
-
-    [data-theme='nebula-night'] {
-      --color-scheme: dark;
-      --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
-      --card-bg: rgba(17, 24, 39, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --surface-bg: rgba(15, 23, 42, 0.55);
-      --surface-border: rgba(148, 163, 184, 0.25);
-      --switch-track: rgba(148, 163, 184, 0.3);
-      --switch-thumb: #0f172a;
-      --accent: #38bdf8;
-      --accent-dark: #0ea5e9;
-      --text: #f9fafb;
-      --text-muted: rgba(255, 255, 255, 0.7);
-      --button-text: #0f172a;
-      --focus-ring: rgba(56, 189, 248, 0.25);
-      --option-hover-shadow: rgba(8, 145, 178, 0.2);
-      --secondary-button-bg: transparent;
-      --secondary-button-border: rgba(148, 163, 184, 0.3);
-      --secondary-button-text: rgba(248, 250, 252, 0.75);
-      --secondary-button-hover-bg: rgba(148, 163, 184, 0.1);
-      --secondary-button-hover-text: #f1f5f9;
-      --swatch-border: rgba(255, 255, 255, 0.08);
-    }
-
-    [data-theme='crisp-white'] {
-      --color-scheme: light;
-      --bg-gradient: linear-gradient(135deg, #ffffff, #f1f5f9);
-      --card-bg: rgba(255, 255, 255, 0.92);
-      --card-border: rgba(15, 23, 42, 0.08);
-      --surface-bg: rgba(241, 245, 249, 0.85);
-      --surface-border: rgba(15, 23, 42, 0.12);
-      --switch-track: rgba(15, 23, 42, 0.2);
-      --switch-thumb: #1f2937;
-      --accent: #2563eb;
-      --accent-dark: #1d4ed8;
-      --text: #111827;
-      --text-muted: #475569;
-      --button-text: #f8fafc;
-      --focus-ring: rgba(37, 99, 235, 0.25);
-      --option-hover-shadow: rgba(37, 99, 235, 0.15);
-      --secondary-button-bg: rgba(148, 163, 184, 0.12);
-      --secondary-button-border: rgba(15, 23, 42, 0.12);
-      --secondary-button-text: #1f2937;
-      --secondary-button-hover-bg: rgba(37, 99, 235, 0.12);
-      --secondary-button-hover-text: #1f2937;
-      --swatch-border: rgba(15, 23, 42, 0.12);
-    }
-
-    [data-theme='contrast-black'] {
-      --color-scheme: dark;
-      --bg-gradient: linear-gradient(135deg, #000000, #111827);
-      --card-bg: rgba(10, 10, 12, 0.9);
-      --card-border: rgba(148, 163, 184, 0.15);
-      --surface-bg: rgba(17, 24, 39, 0.7);
-      --surface-border: rgba(148, 163, 184, 0.25);
-      --switch-track: rgba(148, 163, 184, 0.35);
-      --switch-thumb: #111827;
-      --accent: #f97316;
-      --accent-dark: #ea580c;
-      --text: #f9fafb;
-      --text-muted: rgba(226, 232, 240, 0.75);
-      --button-text: #111827;
-      --focus-ring: rgba(249, 115, 22, 0.3);
-      --option-hover-shadow: rgba(249, 115, 22, 0.25);
-      --secondary-button-bg: transparent;
-      --secondary-button-border: rgba(148, 163, 184, 0.35);
-      --secondary-button-text: rgba(226, 232, 240, 0.8);
-      --secondary-button-hover-bg: rgba(148, 163, 184, 0.18);
-      --secondary-button-hover-text: #f8fafc;
-      --swatch-border: rgba(255, 255, 255, 0.12);
-    }
-
-    [data-theme='ocean-teal'] {
-      --color-scheme: dark;
-      --bg-gradient: linear-gradient(135deg, #0f172a, #0d9488);
-      --card-bg: rgba(15, 23, 42, 0.78);
-      --card-border: rgba(148, 163, 184, 0.18);
-      --surface-bg: rgba(8, 47, 73, 0.65);
-      --surface-border: rgba(94, 234, 212, 0.25);
-      --switch-track: rgba(45, 212, 191, 0.3);
-      --switch-thumb: #083344;
-      --accent: #2dd4bf;
-      --accent-dark: #14b8a6;
-      --text: #ecfeff;
-      --text-muted: rgba(207, 250, 254, 0.75);
-      --button-text: #042f2e;
-      --focus-ring: rgba(45, 212, 191, 0.32);
-      --option-hover-shadow: rgba(20, 184, 166, 0.3);
-      --secondary-button-bg: transparent;
-      --secondary-button-border: rgba(148, 163, 184, 0.35);
-      --secondary-button-text: rgba(207, 250, 254, 0.85);
-      --secondary-button-hover-bg: rgba(45, 212, 191, 0.18);
-      --secondary-button-hover-text: #ecfeff;
-      --swatch-border: rgba(255, 255, 255, 0.1);
-    }
-
-    [data-theme='sunrise-gold'] {
-      --color-scheme: light;
-      --bg-gradient: linear-gradient(135deg, #fff7ed, #fed7aa 55%, #fbbf24);
-      --card-bg: rgba(255, 247, 237, 0.92);
-      --card-border: rgba(124, 45, 18, 0.12);
-      --surface-bg: rgba(255, 237, 213, 0.9);
-      --surface-border: rgba(124, 45, 18, 0.15);
-      --switch-track: rgba(249, 115, 22, 0.25);
-      --switch-thumb: #9a3412;
-      --accent: #d97706;
-      --accent-dark: #b45309;
-      --text: #7c2d12;
-      --text-muted: rgba(120, 53, 15, 0.8);
-      --button-text: #fff7ed;
-      --focus-ring: rgba(217, 119, 6, 0.28);
-      --option-hover-shadow: rgba(217, 119, 6, 0.2);
-      --secondary-button-bg: rgba(255, 255, 255, 0.45);
-      --secondary-button-border: rgba(124, 45, 18, 0.18);
-      --secondary-button-text: #7c2d12;
-      --secondary-button-hover-bg: rgba(217, 119, 6, 0.18);
-      --secondary-button-hover-text: #7c2d12;
-      --swatch-border: rgba(124, 45, 18, 0.18);
-    }
-
-    [data-theme='forest-focus'] {
-      --color-scheme: dark;
-      --bg-gradient: linear-gradient(135deg, #052e16, #064e3b 50%, #1e3a8a);
-      --card-bg: rgba(6, 78, 59, 0.78);
-      --card-border: rgba(134, 239, 172, 0.2);
-      --surface-bg: rgba(4, 47, 29, 0.65);
-      --surface-border: rgba(74, 222, 128, 0.3);
-      --switch-track: rgba(74, 222, 128, 0.35);
-      --switch-thumb: #052e16;
-      --accent: #22c55e;
-      --accent-dark: #16a34a;
-      --text: #ecfdf5;
-      --text-muted: rgba(209, 250, 229, 0.78);
-      --button-text: #052e16;
-      --focus-ring: rgba(34, 197, 94, 0.3);
-      --option-hover-shadow: rgba(34, 197, 94, 0.28);
-      --secondary-button-bg: transparent;
-      --secondary-button-border: rgba(74, 222, 128, 0.32);
-      --secondary-button-text: rgba(209, 250, 229, 0.85);
-      --secondary-button-hover-bg: rgba(74, 222, 128, 0.2);
-      --secondary-button-hover-text: #ecfdf5;
-      --swatch-border: rgba(240, 253, 244, 0.12);
-    }
-
-    [data-theme='royal-plum'] {
-      --color-scheme: dark;
-      --bg-gradient: linear-gradient(135deg, #2e1065, #6d28d9 55%, #be185d);
-      --card-bg: rgba(46, 16, 101, 0.82);
-      --card-border: rgba(233, 213, 255, 0.18);
-      --surface-bg: rgba(76, 29, 149, 0.65);
-      --surface-border: rgba(216, 180, 254, 0.3);
-      --switch-track: rgba(216, 180, 254, 0.35);
-      --switch-thumb: #4c1d95;
-      --accent: #f472b6;
-      --accent-dark: #ec4899;
-      --text: #fdf4ff;
-      --text-muted: rgba(248, 209, 255, 0.8);
-      --button-text: #4c0519;
-      --focus-ring: rgba(244, 114, 182, 0.3);
-      --option-hover-shadow: rgba(236, 72, 153, 0.28);
-      --secondary-button-bg: transparent;
-      --secondary-button-border: rgba(216, 180, 254, 0.35);
-      --secondary-button-text: rgba(248, 209, 255, 0.85);
-      --secondary-button-hover-bg: rgba(244, 114, 182, 0.2);
-      --secondary-button-hover-text: #fdf4ff;
-      --swatch-border: rgba(248, 209, 255, 0.22);
-    }
-
-    .toggle-row {
-      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
-      padding: 1rem 1.25rem; background: var(--surface-bg);
-      border: 1px solid var(--surface-border); border-radius: 16px;
-    }
-
-    .toggle-row.disabled { opacity: 0.55; cursor: not-allowed; }
-
-    .toggle-row .details { display: flex; flex-direction: column; gap: 0.3rem; }
-    .toggle-row strong { font-size: 1.05rem; }
-    .toggle-row span { color: var(--text-muted); font-size: 0.95rem; }
-
-    .switch { position: relative; width: 58px; height: 32px; flex-shrink: 0; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-
-    .slider { position: absolute; inset: 0; cursor: pointer; background: var(--switch-track); border-radius: 999px; transition: background 0.2s ease; }
-    .slider::before {
-      content: ''; position: absolute; height: 26px; width: 26px; left: 3px; bottom: 3px;
-      background: var(--switch-thumb); border-radius: 50%; transition: transform 0.2s ease, background 0.2s ease; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.4);
-    }
-
-    .switch input:checked + .slider { background: var(--accent); }
-    .switch input:checked + .slider::before { transform: translateX(26px); background: #fff; }
-
     button {
-      background: var(--accent); color: var(--button-text); border: none; border-radius: 999px;
-      padding: 1.1rem 2.75rem; font-size: 1.2rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-      cursor: pointer; align-self: flex-start; transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      background: #38bdf8;
+      border: none;
+      border-radius: 50px;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: #0f172a;
     }
-
-    button:hover { transform: translateY(-2px); background: var(--accent-dark); box-shadow: 0 12px 30px rgba(56, 189, 248, 0.3); }
-
-    .error-message { display: none; color: #f87171; background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.3); border-radius: 12px; padding: 0.85rem 1rem; font-weight: 600; }
-
-    @media (max-width: 768px) {
-      body { padding: 1.5rem; }
-      textarea { min-height: 180px; }
+    h1 {
+      margin-top: 0;
+      text-transform: uppercase;
+    }
+    .option-card {
+      margin: 0.5rem 0;
     }
   </style>
 </head>
 <body>
   <main class="app-shell">
-    <header>
-      <h1>Sentence Trainer</h1>
-      <p>Load in your bilingual sentences, pick a practice style, and choose a projection-friendly colour theme.</p>
-    </header>
+    <h1>Sentence Trainer</h1>
+    <p>Enter your sentence pairs below (German = English):</p>
+    <textarea id="sentenceInput" placeholder="Guten Morgen = Good morning"></textarea>
 
-    <section class="panel" aria-labelledby="sentence-input-label">
-      <label class="section-title" id="sentence-input-label" for="sentenceInput">Sentence pairs</label>
-      <p class="helper-text">Use the format Target language sentence = English sentence.</p>
-      <textarea id="sentenceInput" placeholder="Guten Morgen = Good morning"></textarea>
-      <div class="error-message" id="errorMessage" role="alert"></div>
-    </section>
+    <h3>Practice mode</h3>
+    <div class="option-card">
+      <label><input type="radio" name="mode" value="german-no-vowels" checked> German without vowels</label>
+    </div>
+    <div class="option-card">
+      <label><input type="radio" name="mode" value="german-no-consonants"> German without consonants</label>
+    </div>
+    <div class="option-card">
+      <label><input type="radio" name="mode" value="initials"> German initials only</label>
+    </div>
+    <div class="option-card">
+      <label><input type="radio" name="mode" value="flashcard-german-first"> Flashcard (German first)</label>
+    </div>
+    <div class="option-card">
+      <label><input type="radio" name="mode" value="flashcard-english-first"> Flashcard (English first)</label>
+    </div>
 
-    <section class="panel" aria-labelledby="mode-label">
-      <label class="section-title" id="mode-label">Sentence options</label>
-      <div class="options" id="modeOptions">
-        <label class="option-card">
-          <input type="radio" name="mode" value="german-no-vowels" checked />
-          <span>German without vowels</span>
-        </label>
-        <label class="option-card">
-          <input type="radio" name="mode" value="german-no-consonants" />
-          <span>German without consonants</span>
-        </label>
-        <label class="option-card">
-          <input type="radio" name="mode" value="initials" />
-          <span>German initials only</span>
-        </label>
-        <label class="option-card">
-          <input type="radio" name="mode" value="flashcard-german-first" />
-          <span>Flashcard German first</span>
-        </label>
-        <label class="option-card">
-          <input type="radio" name="mode" value="flashcard-english-first" />
-          <span>Flashcard English first</span>
-        </label>
-      </div>
-    </section>
+    <h3>Options</h3>
+    <div>
+      <label><input type="checkbox" id="ttsToggle"> Enable text-to-speech</label>
+    </div>
+    <div>
+      <label><input type="checkbox" id="listeningOnlyToggle"> Listening only mode</label>
+    </div>
 
-    <section class="panel" aria-labelledby="tts-label">
-      <label class="section-title" id="tts-label">Audio</label>
-      <div class="toggle-row" id="ttsRow">
-        <div class="details">
-          <strong>Text to speech</strong>
-          <span>Play the practice prompts aloud in German and English.</span>
-          <span id="ttsUnsupportedMessage" hidden>Speech synthesis is unavailable in this browser.</span>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="ttsToggle" />
-          <span class="slider"></span>
-        </label>
-      </div>
-    </section>
-
-    <!-- NEW: Listening-only toggle -->
-    <section class="panel" aria-labelledby="listening-label">
-      <label class="section-title" id="listening-label">Presentation</label>
-      <div class="toggle-row">
-        <div class="details">
-          <strong>Listening only</strong>
-          <span>Hide translations and speak only the target language during practice.</span>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="listeningOnlyToggle" />
-          <span class="slider"></span>
-        </label>
-      </div>
-    </section>
-
-    <section class="panel" aria-labelledby="theme-label">
-      <label class="section-title" id="theme-label">Colour themes</label>
-      <div class="theme-grid" id="themeOptions" role="radiogroup"></div>
-    </section>
-
-    <button id="startBtn" type="button">Start practice</button>
+    <button id="startBtn">Start practice</button>
   </main>
 
   <script>
-    const sentenceInput = document.getElementById('sentenceInput');
-    const startBtn = document.getElementById('startBtn');
-    const errorMessage = document.getElementById('errorMessage');
-    const themeOptionsContainer = document.getElementById('themeOptions');
-    const ttsToggle = document.getElementById('ttsToggle');
-    const ttsRow = document.getElementById('ttsRow');
-    const ttsUnsupportedMessage = document.getElementById('ttsUnsupportedMessage');
-    const listeningOnlyToggle = document.getElementById('listeningOnlyToggle');
-
     const CONFIG_KEY = 'sentenceTrainerConfig';
-
-    const themes = [
-      { id: 'nebula-night', name: 'Nebula Night', description: 'Electric midnight blues with cyan highlights.', swatch: ['#111827', '#312e81', '#38bdf8'] },
-      { id: 'crisp-white', name: 'Crisp White', description: 'Jet-black lettering on a bright white canvas.', swatch: ['#ffffff', '#e2e8f0', '#2563eb'] },
-      { id: 'contrast-black', name: 'Contrast Black', description: 'White lettering on a deep-black backdrop.', swatch: ['#000000', '#111827', '#f97316'] },
-      { id: 'ocean-teal', name: 'Ocean Teal', description: 'Cool marine greens with luminous accents.', swatch: ['#0f172a', '#0d9488', '#2dd4bf'] },
-      { id: 'sunrise-gold', name: 'Sunrise Gold', description: 'Warm amber hues ready for morning sessions.', swatch: ['#fff7ed', '#fbbf24', '#d97706'] },
-      { id: 'forest-focus', name: 'Forest Focus', description: 'Evergreen depth with energized lime accents.', swatch: ['#052e16', '#16a34a', '#22c55e'] },
-      { id: 'royal-plum', name: 'Royal Plum', description: 'Vivid purples with magenta highlights.', swatch: ['#2e1065', '#6d28d9', '#f472b6'] }
-    ];
-
-    let activeTheme = 'nebula-night';
-    let ttsEnabled = false;
-
-    const supportsSpeech = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
-
-    function applyTheme(themeId) {
-      activeTheme = themeId;
-      document.documentElement.setAttribute('data-theme', themeId);
-    }
-
-    function renderThemeOptions() {
-      themeOptionsContainer.innerHTML = '';
-      themes.forEach(theme => {
-        const label = document.createElement('label');
-        label.className = 'theme-card';
-
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'theme';
-        input.value = theme.id;
-        input.checked = theme.id === activeTheme;
-        input.addEventListener('change', () => {
-          if (input.checked) {
-            applyTheme(theme.id);
-            updateActiveThemeCard();
-            persistConfig({ theme: theme.id });
-          }
-        });
-
-        const swatch = document.createElement('div');
-        swatch.className = 'theme-swatch';
-        swatch.style.background = theme.swatch.length > 1 ? `linear-gradient(135deg, ${theme.swatch.join(', ')})` : theme.swatch[0];
-
-        const details = document.createElement('div');
-        details.className = 'theme-details';
-        const title = document.createElement('strong');
-        title.textContent = theme.name;
-        const description = document.createElement('span');
-        description.textContent = theme.description;
-        details.append(title, description);
-
-        label.append(input, swatch, details);
-        if (theme.id === activeTheme) {
-          label.classList.add('active');
-        }
-        themeOptionsContainer.append(label);
-      });
-    }
-
-    function updateActiveThemeCard() {
-      const cards = themeOptionsContainer.querySelectorAll('.theme-card');
-      cards.forEach(card => {
-        const input = card.querySelector('input[name="theme"]');
-        const isActive = input && input.value === activeTheme;
-        card.classList.toggle('active', Boolean(isActive));
-      });
-    }
-
-    function parseSentences(rawInput) {
-      return rawInput
-        .split(/\n+/)
-        .map(line => line.trim())
-        .filter(Boolean)
-        .map(line => {
-          const separatorIndex = line.indexOf('=');
-          if (separatorIndex === -1) {
-            throw new Error('Each line must contain a target sentence, an equal sign, and an English translation.');
-          }
-          const german = line.slice(0, separatorIndex).trim();
-          const english = line.slice(separatorIndex + 1).trim();
-          if (!german || !english) {
-            throw new Error('Each line must contain text on both sides of the equal sign.');
-          }
-          return { german, english };
-        });
-    }
-
-    function persistConfig(partialUpdate = {}) {
-      try {
-        const existing = sessionStorage.getItem(CONFIG_KEY);
-        const parsed = existing ? JSON.parse(existing) : {};
-        const updated = { ...parsed, ...partialUpdate };
-        sessionStorage.setItem(CONFIG_KEY, JSON.stringify(updated));
-      } catch (error) {
-        console.warn('Unable to persist configuration', error);
-      }
-    }
-
-    function restoreFromConfig() {
-      const existing = sessionStorage.getItem(CONFIG_KEY);
-      if (!existing) {
-        applyTheme(activeTheme);
-        renderThemeOptions();
-        updateActiveThemeCard();
-        return;
-      }
-
-      try {
-        const config = JSON.parse(existing);
-        if (config.rawInput) {
-          sentenceInput.value = config.rawInput;
-        }
-        if (config.mode) {
-          let modeValue = config.mode;
-          if (modeValue === 'flashcard') modeValue = 'flashcard-german-first';
-          else if (modeValue === 'english') modeValue = 'flashcard-english-first';
-          else if (modeValue === 'german') modeValue = 'flashcard-german-first';
-          const modeInput = document.querySelector(`input[name="mode"][value="${modeValue}"]`);
-          if (modeInput) modeInput.checked = true;
-          else {
-            const def = document.querySelector('input[name="mode"][value="german-no-vowels"]');
-            if (def) def.checked = true;
-          }
-        }
-        if (config.theme) {
-          activeTheme = config.theme;
-        }
-        if (supportsSpeech && typeof config.tts === 'boolean') {
-          ttsEnabled = config.tts;
-          ttsToggle.checked = ttsEnabled;
-        }
-        if (typeof config.listeningOnly === 'boolean' && listeningOnlyToggle) {
-          listeningOnlyToggle.checked = config.listeningOnly;
-        }
-        applyTheme(activeTheme);
-      } catch (error) {
-        console.warn('Unable to restore configuration', error);
-        applyTheme(activeTheme);
-      }
-
-      renderThemeOptions();
-      updateActiveThemeCard();
-    }
-
-    applyTheme(activeTheme);
-    renderThemeOptions();
-    updateActiveThemeCard();
-
-    if (!supportsSpeech) {
-      ttsRow.classList.add('disabled');
-      ttsToggle.disabled = true;
-      ttsUnsupportedMessage.hidden = false;
-    } else {
-      ttsToggle.addEventListener('change', event => {
-        ttsEnabled = event.target.checked;
-        persistConfig({ tts: ttsEnabled });
-      });
-    }
-
-    if (listeningOnlyToggle) {
-      listeningOnlyToggle.addEventListener('change', () => {
-        persistConfig({ listeningOnly: listeningOnlyToggle.checked });
-      });
-    }
-
-    restoreFromConfig();
+    const startBtn = document.getElementById('startBtn');
+    const sentenceInput = document.getElementById('sentenceInput');
 
     startBtn.addEventListener('click', () => {
-      try {
-        const sentences = parseSentences(sentenceInput.value);
-        if (!sentences.length) {
-          throw new Error('Please add at least one sentence pair before starting.');
-        }
+      const lines = sentenceInput.value.trim().split(/\n+/).filter(Boolean);
+      const sentences = lines.map(line => {
+        const parts = line.split('=');
+        return { german: parts[0].trim(), english: parts[1].trim() };
+      });
 
-        const selectedMode = document.querySelector('input[name="mode"]:checked');
-        const activeMode = selectedMode ? selectedMode.value : 'german-no-vowels';
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      const tts = document.getElementById('ttsToggle').checked;
+      const listeningOnly = document.getElementById('listeningOnlyToggle').checked;
 
-        const config = {
-          sentences,
-          mode: activeMode,
-          theme: activeTheme,
-          tts: supportsSpeech ? ttsEnabled : false,
-          listeningOnly: listeningOnlyToggle ? listeningOnlyToggle.checked : false,
-          rawInput: sentenceInput.value
-        };
-
-        sessionStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-        errorMessage.style.display = 'none';
-        window.location.href = 'practice.html';
-      } catch (error) {
-        errorMessage.textContent = error.message;
-        errorMessage.style.display = 'block';
-      }
+      const config = { sentences, mode, tts, listeningOnly };
+      sessionStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+      window.location.href = 'practice.html';
     });
   </script>
 </body>
 </html>
-
 
 <!-- practice.html -->
 <!DOCTYPE html>
@@ -643,211 +119,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sentence Trainer Practice</title>
   <style>
-    :root {
-      --color-scheme: dark;
-      color-scheme: var(--color-scheme, light dark);
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
-      --card-bg: rgba(17, 24, 39, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --surface-bg: rgba(15, 23, 42, 0.55);
-      --surface-border: rgba(148, 163, 184, 0.25);
-      --accent: #38bdf8;
-      --accent-dark: #0ea5e9;
-      --text: #f9fafb;
-      --text-muted: rgba(255, 255, 255, 0.7);
-      --sentence-color: #f9fafb;
-      --sentence-shadow: rgba(56, 189, 248, 0.4);
-      --translation-color: rgba(248, 250, 252, 0.9);
-      --focus-ring: rgba(56, 189, 248, 0.25);
-      --secondary-button-bg: transparent;
-      --secondary-button-border: rgba(148, 163, 184, 0.3);
-      --secondary-button-text: rgba(248, 250, 252, 0.75);
-      --secondary-button-hover-bg: rgba(148, 163, 184, 0.12);
-      --secondary-button-hover-text: #f1f5f9;
-      --swatch-border: rgba(255, 255, 255, 0.08);
-      --button-text: #0f172a;
-    }
-
-    * { box-sizing: border-box; }
-
     body {
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
+      color: #f9fafb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
       margin: 0;
-      min-height: 100vh;
-      display: flex; justify-content: center; align-items: center;
-      background: var(--bg-gradient); color: var(--text);
-      padding: clamp(1.5rem, 3vw + 1rem, 3rem);
-      transition: background 0.4s ease, color 0.4s ease;
-      position: relative;
     }
-
-    .top-actions { position: absolute; top: clamp(1rem, 2vw + 0.5rem, 2.5rem); right: clamp(1rem, 3vw, 3rem); display: flex; }
-
     .practice-shell {
-      width: min(1100px, 100%);
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: rgba(17, 24, 39, 0.85);
       border-radius: 24px;
-      box-shadow: 0 30px 80px rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(22px);
-      padding: clamp(2rem, 3vw + 1rem, 3.5rem);
-      display: grid; gap: clamp(1.5rem, 2vw + 1rem, 2.75rem);
+      padding: 3rem;
+      width: min(900px, 95%);
+      text-align: center;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
     }
-
-    header { display: flex; flex-direction: column; gap: 0.45rem; }
-
-    header h1 { margin: 0; font-size: clamp(2.2rem, 4vw + 1rem, 3.6rem); letter-spacing: 0.04em; text-transform: uppercase; }
-    header p { margin: 0; color: var(--text-muted); font-size: clamp(1rem, 0.7vw + 0.9rem, 1.25rem); max-width: 720px; }
-
-    .display-card { background: var(--surface-bg); border: 1px solid var(--surface-border); border-radius: 22px; padding: clamp(1.75rem, 3vw + 1rem, 3rem); display: flex; flex-direction: column; gap: clamp(1.25rem, 2vw + 0.5rem, 2rem); text-align: center; }
-
-    .mode-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-
-    .mode-label { font-size: clamp(0.85rem, 0.5vw + 0.75rem, 1.1rem); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
-
-    .speech-toggle {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      background: var(--secondary-button-bg); border: 1px solid var(--secondary-button-border);
-      color: var(--secondary-button-text); border-radius: 999px; padding: 0.35rem 0.85rem;
-      font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
+    button {
+      background: #38bdf8;
+      border: none;
+      border-radius: 999px;
+      padding: 0.75rem 1.85rem;
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #0f172a;
+      cursor: pointer;
+      margin: 0.5rem;
     }
-    .speech-toggle:hover { background: var(--secondary-button-hover-bg); color: var(--secondary-button-hover-text); }
-    .speech-toggle:disabled { opacity: 0.6; cursor: not-allowed; }
-
     .sentence-output {
-      font-size: clamp(2.6rem, 6vw + 0.8rem, 4.6rem); font-weight: 800; letter-spacing: 0.04em; line-height: 1.25;
-      min-height: 4rem; color: var(--sentence-color); text-shadow: 0 8px 25px var(--sentence-shadow); word-break: break-word;
+      font-size: 3rem;
+      font-weight: 700;
+      margin: 1.5rem 0;
     }
-
-    .translation-output { font-size: clamp(1.3rem, 2vw + 0.8rem, 2.1rem); font-weight: 600; color: var(--translation-color); opacity: 0.9; min-height: 2rem; font-style: normal; }
-    .practice-shell.flashcard-mode .translation-output { font-size: clamp(2.6rem, 6vw + 0.8rem, 4.6rem); font-weight: 400; font-style: italic; }
-
-    .flashcard-row { display: flex; justify-content: center; }
-
-    .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
-
-    button.pill-btn {
-      background: var(--accent); color: var(--button-text); border: none; border-radius: 999px;
-      padding: 0.75rem 1.85rem; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer;
-      transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    button.pill-btn:hover { transform: translateY(-2px); background: var(--accent-dark); box-shadow: 0 10px 26px rgba(56, 189, 248, 0.35); }
-
-    button.pill-btn.secondary { background: var(--secondary-button-bg); color: var(--secondary-button-text); border: 1px solid var(--secondary-button-border); box-shadow: none; }
-    button.pill-btn.secondary:hover { background: var(--secondary-button-hover-bg); color: var(--secondary-button-hover-text); transform: none; }
-
-    .support-note { font-size: 0.85rem; color: var(--text-muted); }
-
-    /* theme variants mirror setup page */
-    [data-theme='nebula-night'] { --color-scheme: dark; --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81); --card-bg: rgba(17,24,39,0.75); --card-border: rgba(255,255,255,0.08); --surface-bg: rgba(15,23,42,0.55); --surface-border: rgba(148,163,184,0.25); --accent:#38bdf8; --accent-dark:#0ea5e9; --text:#f9fafb; --text-muted:rgba(255,255,255,0.7); --sentence-color:#f9fafb; --sentence-shadow:rgba(56,189,248,0.4); --translation-color:rgba(248,250,252,0.9); --secondary-button-bg:transparent; --secondary-button-border:rgba(148,163,184,0.3); --secondary-button-text:rgba(248,250,252,0.75); --secondary-button-hover-bg:rgba(148,163,184,0.1); --secondary-button-hover-text:#f1f5f9; --button-text:#0f172a; }
-    [data-theme='crisp-white'] { --color-scheme: light; --bg-gradient: linear-gradient(135deg,#ffffff,#f1f5f9); --card-bg: rgba(255,255,255,0.92); --card-border: rgba(15,23,42,0.08); --surface-bg: rgba(241,245,249,0.85); --surface-border: rgba(15,23,42,0.12); --accent:#2563eb; --accent-dark:#1d4ed8; --text:#111827; --text-muted:#475569; --sentence-color:#0f172a; --sentence-shadow:rgba(37,99,235,0.2); --translation-color:#1f2937; --secondary-button-bg:rgba(148,163,184,0.12); --secondary-button-border:rgba(15,23,42,0.12); --secondary-button-text:#1f2937; --secondary-button-hover-bg:rgba(37,99,235,0.12); --secondary-button-hover-text:#1f2937; --button-text:#f8fafc; }
-    [data-theme='contrast-black'] { --color-scheme: dark; --bg-gradient: linear-gradient(135deg,#000,#111827); --card-bg: rgba(10,10,12,0.9); --card-border: rgba(148,163,184,0.15); --surface-bg: rgba(17,24,39,0.7); --surface-border: rgba(148,163,184,0.25); --accent:#f97316; --accent-dark:#ea580c; --text:#f9fafb; --text-muted:rgba(226,232,240,0.75); --sentence-color:#f9fafb; --sentence-shadow:rgba(249,115,22,0.45); --translation-color:rgba(241,245,249,0.9); --secondary-button-bg:transparent; --secondary-button-border:rgba(148,163,184,0.35); --secondary-button-text:rgba(226,232,240,0.8); --secondary-button-hover-bg:rgba(148,163,184,0.18); --secondary-button-hover-text:#f8fafc; --button-text:#111827; }
-    [data-theme='ocean-teal'] { --color-scheme: dark; --bg-gradient: linear-gradient(135deg,#0f172a,#0d9488); --card-bg: rgba(15,23,42,0.78); --card-border: rgba(148,163,184,0.18); --surface-bg: rgba(8,47,73,0.65); --surface-border: rgba(94,234,212,0.25); --accent:#2dd4bf; --accent-dark:#14b8a6; --text:#ecfeff; --text-muted:rgba(207,250,254,0.75); --sentence-color:#ecfeff; --sentence-shadow:rgba(20,184,166,0.45); --translation-color:rgba(207,250,254,0.92); --secondary-button-bg:transparent; --secondary-button-border:rgba(148,163,184,0.35); --secondary-button-text:rgba(207,250,254,0.85); --secondary-button-hover-bg:rgba(45,212,191,0.18); --secondary-button-hover-text:#ecfeff; --button-text:#042f2e; }
-    [data-theme='sunrise-gold'] { --color-scheme: light; --bg-gradient: linear-gradient(135deg,#fff7ed,#fed7aa 55%,#fbbf24); --card-bg: rgba(255,247,237,0.92); --card-border: rgba(124,45,18,0.12); --surface-bg: rgba(255,237,213,0.9); --surface-border: rgba(124,45,18,0.15); --accent:#d97706; --accent-dark:#b45309; --text:#7c2d12; --text-muted:rgba(120,53,15,0.8); --sentence-color:#7c2d12; --sentence-shadow:rgba(217,119,6,0.3); --translation-color:#374151; --secondary-button-bg:rgba(255,255,255,0.45); --secondary-button-border:rgba(124,45,18,0.18); --secondary-button-text:#7c2d12; --secondary-button-hover-bg:rgba(217,119,6,0.18); --secondary-button-hover-text:#7c2d12; --button-text:#fff7ed; }
-    [data-theme='forest-focus'] { --color-scheme: dark; --bg-gradient: linear-gradient(135deg,#052e16,#064e3b 50%,#1e3a8a); --card-bg: rgba(6,78,59,0.78); --card-border: rgba(134,239,172,0.2); --surface-bg: rgba(4,47,29,0.65); --surface-border: rgba(74,222,128,0.3); --accent:#22c55e; --accent-dark:#16a34a; --text:#ecfdf5; --text-muted:rgba(209,250,229,0.78); --sentence-color:#f0fdf4; --sentence-shadow:rgba(34,197,94,0.35); --translation-color:rgba(209,250,229,0.9); --secondary-button-bg:transparent; --secondary-button-border:rgba(74,222,128,0.32); --secondary-button-text:rgba(209,250,229,0.85); --secondary-button-hover-bg:rgba(74,222,128,0.2); --secondary-button-hover-text:#ecfdf5; --button-text:#052e16; }
-    [data-theme='royal-plum'] { --color-scheme: dark; --bg-gradient: linear-gradient(135deg,#2e1065,#6d28d9 55%,#be185d); --card-bg: rgba(46,16,101,0.82); --card-border: rgba(233,213,255,0.18); --surface-bg: rgba(76,29,149,0.65); --surface-border: rgba(216,180,254,0.3); --accent:#f472b6; --accent-dark:#ec4899; --text:#fdf4ff; --text-muted:rgba(248,209,255,0.8); --sentence-color:#fdf2f8; --sentence-shadow:rgba(236,72,153,0.4); --translation-color:rgba(248,209,255,0.92); --secondary-button-bg:transparent; --secondary-button-border:rgba(216,180,254,0.35); --secondary-button-text:rgba(248,209,255,0.85); --secondary-button-hover-bg:rgba(244,114,182,0.2); --secondary-button-hover-text:#fdf4ff; --button-text:#4c0519; }
-
-    @media (max-width: 768px) {
-      body { padding: 1.5rem; }
-      .mode-row { flex-direction: column; }
-      .sentence-output { font-size: clamp(2.2rem, 8vw + 0.8rem, 4rem); }
-      .controls { flex-direction: column; }
+    .translation-output {
+      font-size: 1.6rem;
+      opacity: 0.9;
     }
   </style>
 </head>
 <body>
-  <div class="top-actions" id="topSetupContainer" hidden>
-    <button class="pill-btn" id="topSetupButton" type="button">Go to setup</button>
-  </div>
-  <main class="practice-shell" id="practiceShell" hidden>
-    <header>
-      <h1>Sentence Trainer</h1>
-    </header>
-
-    <section class="display-card" aria-live="polite">
-      <div class="mode-row">
-        <span class="mode-label" id="modeLabel">Sentence spotlight</span>
-        <button class="speech-toggle" id="speechToggle" type="button">Speech: Off</button>
-      </div>
-      <div class="sentence-output" id="sentenceOutput">Loading…</div>
-      <div class="translation-output" id="translationOutput"></div>
-      <div class="flashcard-row" id="flashcardRow" hidden>
-        <button class="pill-btn" id="revealBtn" type="button">Reveal translation</button>
-      </div>
-      <div class="controls">
-        <button class="pill-btn" id="anotherBtn" type="button">Another sentence</button>
-        <button class="pill-btn secondary" id="backBtn" type="button">Back to setup</button>
-      </div>
-      <div class="support-note" id="speechSupportNote" hidden>Speech synthesis is unavailable in this browser.</div>
-    </section>
+  <main class="practice-shell" id="practiceShell">
+    <h1>Sentence Trainer</h1>
+    <div class="sentence-output" id="sentenceOutput">Loading…</div>
+    <div class="translation-output" id="translationOutput"></div>
+    <div>
+      <button id="revealBtn">Reveal translation</button>
+      <button id="anotherBtn">Another sentence</button>
+    </div>
   </main>
 
   <script>
     const CONFIG_KEY = 'sentenceTrainerConfig';
+    const config = JSON.parse(sessionStorage.getItem(CONFIG_KEY));
 
     const sentenceOutput = document.getElementById('sentenceOutput');
     const translationOutput = document.getElementById('translationOutput');
-    const modeLabel = document.getElementById('modeLabel');
     const revealBtn = document.getElementById('revealBtn');
-    const flashcardRow = document.getElementById('flashcardRow');
     const anotherBtn = document.getElementById('anotherBtn');
-    const backBtn = document.getElementById('backBtn');
-    const speechToggle = document.getElementById('speechToggle');
-    const speechSupportNote = document.getElementById('speechSupportNote');
-    const practiceShell = document.getElementById('practiceShell');
-    const topSetupContainer = document.getElementById('topSetupContainer');
-    const topSetupButton = document.getElementById('topSetupButton');
 
-    const modeDescriptions = {
-      'german-no-vowels': 'German without vowels',
-      'german-no-consonants': 'German without consonants',
-      initials: 'German initials only',
-      'flashcard-german-first': 'Flashcard (German first)',
-      'flashcard-english-first': 'Flashcard (English first)'
-    };
+    let index = 0;
 
-    const supportsSpeech = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+    function showSentence() {
+      if (index >= config.sentences.length) index = 0;
+      const s = config.sentences[index++];
+      if (config.listeningOnly) {
+        translationOutput.textContent = '';
+      } else {
+        translationOutput.textContent = s.english;
+      }
+      sentenceOutput.textContent = s.german;
 
-    let sentences = [];
-    let activeMode = 'german-no-vowels';
-    let activeTheme = 'nebula-night';
-    let ttsEnabled = false;
-    let listeningOnly = false; // NEW
-
-    let currentSpeechSegments = [];
-    let flashcardTranslationText = '';
-    let flashcardRevealSpeechSegments = [];
-    let flashcardRevealed = false;
-    let flashcardIndex = 0;
-    let flashcardsCompleted = false;
-
-    const FLASHCARD_MODE_VALUES = ['flashcard-german-first', 'flashcard-english-first'];
-    const FLASHCARD_MODES = new Set(FLASHCARD_MODE_VALUES);
-    const VALID_MODES = new Set(['german-no-vowels','german-no-consonants','initials',...FLASHCARD_MODE_VALUES]);
-
-    function isFlashcardMode(mode) { return FLASHCARD_MODES.has(mode); }
-
-    // NEW: shuffled flashcard deck
-    let flashcardOrder = [];
-    function shuffleInPlace(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
-    function buildFlashcardOrder(){ flashcardOrder = [...Array(sentences.length).keys()]; shuffleInPlace(flashcardOrder); }
-
-    function resetFlashcardProgress(){ flashcardIndex = 0; flashcardsCompleted = false; if (isFlashcardMode(activeMode)) buildFlashcardOrder(); }
-
-    if (topSetupButton) {
-      topSetupButton.addEventListener('click', () => { window.location.href = 'index.html'; });
+      if (config.tts) {
+        const utter = new SpeechSynthesisUtterance(s.german);
+        utter.lang = 'de-DE';
+        speechSynthesis.speak(utter);
+      }
     }
 
-    function applyTheme(themeId) { document.documentElement.setAttribute('data-theme', themeId); }
-
-    function loadConfiguration() {
-      const stored = sessionStorage.getItem(CONFIG_KEY);
-      if (!stored) {
-        practiceShell.hidden = true; practiceShell.classList.remove('flashcard-mode');
-        if (topSetupContainer) topSetupContainer.hidden = false; return false;
+    revealBtn.addEventListener('click', () => {
+      if (!config.listeningOnly) {
+        translationOutput.style.display = translationOutput.style.display === 'none' ? 'block' : 'none';
       }
-      try {
-        const config = JSON.parse(stored);
-        if (!config.sentences || !Array.isArray(config.sentences) || !config.sentences.length) {
-         
+    });
+
+    anotherBtn.addEventListener('click', showSentence);
+
+    showSentence();
+  </script>
+</body>
+</html>
