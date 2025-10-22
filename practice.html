@@ -16,12 +16,15 @@
 
     body { font-family: 'Inter','Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,sans-serif; margin:0; min-height:100vh; display:flex; justify-content:center; align-items:center; background: var(--bg-gradient); color: var(--text); position:relative; }
     .practice-shell { background: rgba(17,24,39,0.85); border-radius: 24px; padding: 3rem; width: min(1000px,95%); text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,0.6); display: grid; gap: 1.25rem; }
-    button { background: #38bdf8; border: none; border-radius: 999px; padding: 0.75rem 1.85rem; font-size: 1rem; font-weight: 700; text-transform: uppercase; color: #0f172a; cursor: pointer; margin: 0.5rem; }
+    button { background: #38bdf8; border: none; border-radius: 999px; padding: 0.75rem 1.1rem; font-size: 1rem; font-weight: 700; text-transform: uppercase; color: #0f172a; cursor: pointer; margin: 0.35rem; }
+    .btn-secondary { background: transparent; border: 1px solid rgba(148,163,184,0.35); color: var(--text); }
     .sentence-output { font-size: 2.4rem; font-weight: 700; margin: 1.2rem 0 0.2rem; line-height: 1.25; }
     .translation-output { font-size: 2.4rem; font-style: italic; font-weight: normal; opacity: 0.95; min-height: 2.4rem; }
-    .controls { display:flex; justify-content:center; gap:.5rem; flex-wrap:wrap; }
+    .controls { display:flex; justify-content:center; gap:.35rem; flex-wrap:wrap; align-items:center; }
+    .flash-controls { display:flex; gap:.35rem; }
     .top-actions { position:absolute; top:2rem; right:2rem; }
     .support-note { font-size:.9rem; opacity:.75; }
+    .meta { font-size:.9rem; opacity:.85; }
   </style>
 </head>
 <body>
@@ -34,9 +37,14 @@
     <div class="sentence-output" id="sentenceOutput">Loading…</div>
     <div class="translation-output" id="translationOutput"></div>
     <div class="controls">
+      <div class="flash-controls" id="flashControls" hidden>
+        <button id="againBtn" class="btn-secondary" title="Mark as not learned">✗ Again</button>
+        <button id="gotItBtn" class="btn-secondary" title="Mark as learned">✓ Got it</button>
+      </div>
       <button id="revealBtn">Reveal translation</button>
       <button id="anotherBtn">Another sentence</button>
     </div>
+    <div class="meta" id="progressMeta" hidden>Card 1 / 1</div>
     <div class="support-note" id="speechNote" hidden>Speech synthesis is unavailable in this browser.</div>
   </main>
 
@@ -51,6 +59,10 @@
     const anotherBtn = document.getElementById('anotherBtn');
     const backBtn = document.getElementById('backBtn');
     const modeLine = document.getElementById('modeLine');
+    const againBtn = document.getElementById('againBtn');
+    const gotItBtn = document.getElementById('gotItBtn');
+    const flashControls = document.getElementById('flashControls');
+    const progressMeta = document.getElementById('progressMeta');
 
     // Load config
     const config = (() => { try { return JSON.parse(sessionStorage.getItem(CONFIG_KEY)) || {}; } catch { return {}; } })();
@@ -96,39 +108,55 @@
     }
 
     // State
-    let index = 0;           // for sequential flashcards
     let revealShown = false; // toggled by the button
     let current = null;      // store the current item for reveal
+
+    // Flashcard deck state
+    let deck = sentences.map((_, i) => i); // queue of indices for the active round
+    let deckPos = 0;                       // position within deck
+    let recycleDeck = [];                  // cards marked with ✗ Again
+    let passCount = 0;                     // how many times we've completed a loop
+
+    function nextFlashcardIndex() {
+      // If we reached the end of the current deck, move to recycled cards (if any)
+      if (deckPos >= deck.length) {
+        if (recycleDeck.length > 0) {
+          deck = recycleDeck;
+          recycleDeck = [];
+          deckPos = 0;
+          passCount++;
+        } else {
+          // fresh full pass again if teacher keeps going
+          deck = sentences.map((_, i) => i);
+          deckPos = 0;
+          passCount++;
+        }
+      }
+      const idx = deck[deckPos++];
+      return idx;
+    }
 
     function pickNext() {
       if (!sentences.length) return null;
 
       if (isFlashcard(mode)) {
-        if (index >= sentences.length) index = 0; // wrap-around deck
-        const s = sentences[index++];
-        if (mode === FLASH_G_FIRST) {
-          return {
-            display: s.german,
-            translation: s.english,
-            isFlashcard: true,
-            speakPrompt: { text: s.german, lang: 'de-DE' },
-            speakReveal: { text: s.english, lang: 'en-US' }
-          };
-        } else { // English first
-          return {
-            display: s.english,
-            translation: s.german,
-            isFlashcard: true,
-            speakPrompt: { text: s.english, lang: 'en-US' },
-            speakReveal: { text: s.german, lang: 'de-DE' }
-          };
-        }
+        const i = nextFlashcardIndex();
+        const s = sentences[i];
+        return {
+          index: i,
+          display: mode === FLASH_G_FIRST ? s.german : s.english,
+          translation: mode === FLASH_G_FIRST ? s.english : s.german,
+          isFlashcard: true,
+          speakPrompt: { text: mode === FLASH_G_FIRST ? s.german : s.english, lang: mode === FLASH_G_FIRST ? 'de-DE' : 'en-US' },
+          speakReveal: { text: mode === FLASH_G_FIRST ? s.english : s.german, lang: mode === FLASH_G_FIRST ? 'en-US' : 'de-DE' }
+        };
       }
 
       // Transform modes work on the German side
       const rand = Math.floor(Math.random() * sentences.length);
       const s = sentences[rand];
       return {
+        index: rand,
         display: transformGerman(s.german, mode),
         translation: s.english,
         isFlashcard: false,
@@ -141,7 +169,6 @@
       if (!ttsEnabled || !supportsSpeech) return;
       if (!segments) return;
       const list = Array.isArray(segments) ? segments : [segments];
-      // Do not cancel queued items harshly when toggling reveal; keep it simple here
       window.speechSynthesis.cancel();
       for (const seg of list) {
         if (!seg || !seg.text) continue;
@@ -152,6 +179,15 @@
       }
     }
 
+    function updateFlashControls(visible) {
+      flashControls.hidden = !visible;
+      progressMeta.hidden = !visible;
+    }
+
+    function setProgress(i, total, extra) {
+      progressMeta.textContent = `Card ${i} / ${total}` + (extra ? ` · Round ${passCount+1}` : '');
+    }
+
     function showNext() {
       const next = pickNext();
       current = next;
@@ -160,6 +196,9 @@
       if (!next) {
         sentenceOutput.textContent = 'Add some sentences first on the setup page!';
         translationOutput.textContent = '';
+        revealBtn.disabled = true;
+        anotherBtn.disabled = true;
+        updateFlashControls(false);
         return;
       }
 
@@ -168,10 +207,17 @@
       translationOutput.textContent = '';
       revealBtn.textContent = 'Reveal translation';
 
-      // Speak prompt; in non-flashcard and not listening-only we also speak the English afterward
+      // Flashcard-only controls + progress
       if (next.isFlashcard) {
+        updateFlashControls(true);
+        // Progress across the *current* deck length
+        const total = deck.length + recycleDeck.length; // approximate visible deck size
+        const shown = Math.min(deckPos, total);
+        setProgress(shown, total, true);
         speak(next.speakPrompt);
       } else {
+        updateFlashControls(false);
+        // In transform modes, obey listeningOnly
         if (listeningOnly) {
           speak(next.speakPrompt);
         } else {
@@ -184,17 +230,28 @@
       if (!current) return;
       revealShown = !revealShown;
       if (revealShown) {
-        // Always show the translation text across all modes.
         translationOutput.textContent = current.translation || '';
         revealBtn.textContent = 'Hide translation';
-        // Only speak the reveal if not in listening-only mode.
         if (!listeningOnly) speak(current.speakReveal);
       } else {
         translationOutput.textContent = '';
         revealBtn.textContent = 'Reveal translation';
-        // Re-speak the prompt when hiding
         speak(current.speakPrompt);
       }
+    });
+
+    // Flashcard grading
+    againBtn.addEventListener('click', () => {
+      if (!current || !current.isFlashcard) return;
+      // queue this card to the end of the round
+      recycleDeck.push(current.index);
+      showNext();
+    });
+
+    gotItBtn.addEventListener('click', () => {
+      if (!current || !current.isFlashcard) return;
+      // simply move on — do not queue
+      showNext();
     });
 
     anotherBtn.addEventListener('click', showNext);
