@@ -1,3 +1,4 @@
+<!-- practice.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,55 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sentence Trainer Practice</title>
   <style>
-    body {
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #111827, #1f2937 45%, #312e81);
-      color: #f9fafb;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      position: relative;
-    }
-    .practice-shell {
-      background: rgba(17, 24, 39, 0.85);
-      border-radius: 24px;
-      padding: 3rem;
-      width: min(1000px, 95%);
-      text-align: center;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-      display: grid;
-      gap: 1.25rem;
-    }
-    button {
-      background: #38bdf8;
-      border: none;
-      border-radius: 999px;
-      padding: 0.75rem 1.85rem;
-      font-size: 1rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #0f172a;
-      cursor: pointer;
-      margin: 0.5rem;
-    }
-    .sentence-output {
-      font-size: 2.4rem; /* SAME SIZE as translation */
-      font-weight: 700;   /* Bold for German */
-      margin: 1.2rem 0 0.2rem;
-      line-height: 1.25;
-    }
-    .translation-output {
-      font-size: 2.4rem;   /* SAME SIZE as German */
-      font-style: italic;  /* Italic for English */
-      font-weight: normal; /* Not bold */
-      opacity: 0.95;
-      min-height: 2.4rem;
-    }
-    .controls { display: flex; justify-content: center; gap: .5rem; flex-wrap: wrap; }
-    .top-actions { position: absolute; top: 2rem; right: 2rem; }
-    .support-note { font-size: .9rem; opacity: .75; }
+    :root { --bg-gradient: linear-gradient(135deg, #111827, #1f2937 45%, #312e81); --text:#f9fafb; }
+    [data-theme='crisp-white'] { --bg-gradient: linear-gradient(135deg,#ffffff,#f1f5f9); --text:#111827; }
+    [data-theme='contrast-black']{ --bg-gradient: linear-gradient(135deg,#000,#111827); --text:#f9fafb; }
+    [data-theme='ocean-teal']{ --bg-gradient: linear-gradient(135deg,#0f172a,#0d9488); --text:#ecfeff; }
+    [data-theme='sunrise-gold']{ --bg-gradient: linear-gradient(135deg,#fff7ed,#fed7aa 55%,#fbbf24); --text:#7c2d12; }
+    [data-theme='forest-focus']{ --bg-gradient: linear-gradient(135deg,#052e16,#064e3b 50%,#1e3a8a); --text:#ecfdf5; }
+    [data-theme='royal-plum']{ --bg-gradient: linear-gradient(135deg,#2e1065,#6d28d9 55%,#be185d); --text:#fdf4ff; }
+
+    body { font-family: 'Inter','Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,sans-serif; margin:0; min-height:100vh; display:flex; justify-content:center; align-items:center; background: var(--bg-gradient); color: var(--text); position:relative; }
+    .practice-shell { background: rgba(17,24,39,0.85); border-radius: 24px; padding: 3rem; width: min(1000px,95%); text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,0.6); display: grid; gap: 1.25rem; }
+    button { background: #38bdf8; border: none; border-radius: 999px; padding: 0.75rem 1.85rem; font-size: 1rem; font-weight: 700; text-transform: uppercase; color: #0f172a; cursor: pointer; margin: 0.5rem; }
+    .sentence-output { font-size: 2.4rem; font-weight: 700; margin: 1.2rem 0 0.2rem; line-height: 1.25; }
+    .translation-output { font-size: 2.4rem; font-style: italic; font-weight: normal; opacity: 0.95; min-height: 2.4rem; }
+    .controls { display:flex; justify-content:center; gap:.5rem; flex-wrap:wrap; }
+    .top-actions { position:absolute; top:2rem; right:2rem; }
+    .support-note { font-size:.9rem; opacity:.75; }
   </style>
 </head>
 <body>
@@ -83,19 +51,22 @@
     const anotherBtn = document.getElementById('anotherBtn');
     const backBtn = document.getElementById('backBtn');
     const modeLine = document.getElementById('modeLine');
-    const speechNote = document.getElementById('speechNote');
 
     // Load config
-    const config = (() => {
-      try { return JSON.parse(sessionStorage.getItem(CONFIG_KEY)) || {}; } catch { return {}; }
-    })();
+    const config = (() => { try { return JSON.parse(sessionStorage.getItem(CONFIG_KEY)) || {}; } catch { return {}; } })();
+
+    // Apply theme from config
+    const theme = config.theme || 'nebula-night';
+    document.documentElement.setAttribute('data-theme', theme);
 
     const sentences = Array.isArray(config.sentences) ? config.sentences : [];
     let mode = config.mode || 'german-no-vowels';
     const listeningOnly = Boolean(config.listeningOnly);
     const ttsEnabled = supportsSpeech && Boolean(config.tts);
 
-    if (!supportsSpeech) speechNote.hidden = false;
+    if (!supportsSpeech) {
+      document.querySelector('.practice-shell').insertAdjacentHTML('beforeend', '<div class="support-note">Speech synthesis is unavailable in this browser.</div>');
+    }
 
     // --- Mode helpers ---
     const FLASH_G_FIRST = 'flashcard-german-first';
@@ -132,7 +103,7 @@
       if (!sentences.length) return null;
 
       if (isFlashcard(mode)) {
-        if (index >= sentences.length) index = 0; // simple wrap-around deck
+        if (index >= sentences.length) index = 0; // wrap-around deck
         const s = sentences[index++];
         if (mode === FLASH_G_FIRST) {
           return {
@@ -205,13 +176,8 @@
       revealBtn.hidden = false;
       revealBtn.textContent = 'Reveal translation';
 
-      // Speak only the prompt side in flashcards
-      if (!listeningOnly) {
-        speak(next.speakDisplay);
-      } else {
-        // listening-only still speaks the prompt side (target of display)
-        speak(next.speakDisplay);
-      }
+      // Speak only the prompt side in flashcards (and in listening-only too)
+      speak(next.speakDisplay);
 
       // Store for reveal handler
       revealBtn._current = next;
@@ -232,9 +198,7 @@
       }
     });
 
-    anotherBtn.addEventListener('click', () => {
-      showNext();
-    });
+    anotherBtn.addEventListener('click', showNext);
 
     backBtn.addEventListener('click', () => {
       if (supportsSpeech) window.speechSynthesis.cancel();
