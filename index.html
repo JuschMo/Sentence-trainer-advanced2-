@@ -1,4 +1,4 @@
-
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -189,80 +189,6 @@
         errorMessage.textContent = err.message || 'Please fix your input.';
         errorMessage.style.display = 'block';
       }
-    });
-  </script>
-</body>
-</html>      background: #38bdf8;
-      border: none;
-      border-radius: 50px;
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-      font-weight: bold;
-      cursor: pointer;
-      color: #0f172a;
-    }
-    h1 {
-      margin-top: 0;
-      text-transform: uppercase;
-    }
-    .option-card {
-      margin: 0.5rem 0;
-    }
-  </style>
-</head>
-<body>
-  <main class="app-shell">
-    <h1>Sentence Trainer</h1>
-    <p>Enter your sentence pairs below (German = English):</p>
-    <textarea id="sentenceInput" placeholder="Guten Morgen = Good morning"></textarea>
-
-    <h3>Practice mode</h3>
-    <div class="option-card">
-      <label><input type="radio" name="mode" value="german-no-vowels" checked> German without vowels</label>
-    </div>
-    <div class="option-card">
-      <label><input type="radio" name="mode" value="german-no-consonants"> German without consonants</label>
-    </div>
-    <div class="option-card">
-      <label><input type="radio" name="mode" value="initials"> German initials only</label>
-    </div>
-    <div class="option-card">
-      <label><input type="radio" name="mode" value="flashcard-german-first"> Flashcard (German first)</label>
-    </div>
-    <div class="option-card">
-      <label><input type="radio" name="mode" value="flashcard-english-first"> Flashcard (English first)</label>
-    </div>
-
-    <h3>Options</h3>
-    <div>
-      <label><input type="checkbox" id="ttsToggle"> Enable text-to-speech</label>
-    </div>
-    <div>
-      <label><input type="checkbox" id="listeningOnlyToggle"> Listening only mode</label>
-    </div>
-
-    <button id="startBtn">Start practice</button>
-  </main>
-
-  <script>
-    const CONFIG_KEY = 'sentenceTrainerConfig';
-    const startBtn = document.getElementById('startBtn');
-    const sentenceInput = document.getElementById('sentenceInput');
-
-    startBtn.addEventListener('click', () => {
-      const lines = sentenceInput.value.trim().split(/\n+/).filter(Boolean);
-      const sentences = lines.map(line => {
-        const parts = line.split('=');
-        return { german: parts[0].trim(), english: parts[1].trim() };
-      });
-
-      const mode = document.querySelector('input[name="mode"]:checked').value;
-      const tts = document.getElementById('ttsToggle').checked;
-      const listeningOnly = document.getElementById('listeningOnlyToggle').checked;
-
-      const config = { sentences, mode, tts, listeningOnly };
-      sessionStorage.setItem(CONFIG_KEY, JSON.stringify(config));
-      window.location.href = 'practice.html';
     });
   </script>
 </body>
